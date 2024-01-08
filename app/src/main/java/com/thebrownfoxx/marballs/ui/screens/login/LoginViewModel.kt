@@ -1,20 +1,16 @@
 package com.thebrownfoxx.marballs.ui.screens.login
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
-import com.thebrownfoxx.marballs.services.auth.AuthService
+import com.thebrownfoxx.marballs.services.authentication.Authentication
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class LoginViewModel(private val authService: AuthService) : ViewModel() {
-    val loggedIn = authService.loggedIn
+class LoginViewModel(private val authentication: Authentication) : ViewModel() {
+    val loggedIn = authentication.loggedIn
 
     private val _errors = MutableSharedFlow<String>()
     val errors = _errors.asSharedFlow()
@@ -47,7 +43,7 @@ class LoginViewModel(private val authService: AuthService) : ViewModel() {
             }
             _loading.value = false
         } else {
-            authService.login(email, password) { loginResult ->
+            authentication.login(email, password) { loginResult ->
                 if (!loginResult.isSuccess) {
                     viewModelScope.launch {
                         _errors.emit(

@@ -1,4 +1,4 @@
-package com.thebrownfoxx.marballs.services.auth
+package com.thebrownfoxx.marballs.services.authentication
 
 import com.google.firebase.auth.FirebaseAuth
 import com.thebrownfoxx.extensions.mapToStateFlow
@@ -9,7 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class FirebaseAuthService(private val auth: FirebaseAuth) : AuthService {
+class FirebaseAuthentication(private val auth: FirebaseAuth) : Authentication {
     private val scope = CoroutineScope(Dispatchers.Main)
 
     private val _currentUser = MutableStateFlow<User?>(null)

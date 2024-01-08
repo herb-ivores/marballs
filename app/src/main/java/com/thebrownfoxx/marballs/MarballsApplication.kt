@@ -6,17 +6,17 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.thebrownfoxx.marballs.services.auth.FirebaseAuthService
+import com.thebrownfoxx.marballs.services.authentication.FirebaseAuthentication
 
 class MarballsApplication: Application() {
     private lateinit var firebaseAuth: FirebaseAuth
-    private lateinit var _authService: FirebaseAuthService
+    private lateinit var _authService: FirebaseAuthentication
     val authService get() = _authService
 
     override fun onCreate() {
         super.onCreate()
         firebaseAuth = Firebase.auth
-        _authService = FirebaseAuthService(firebaseAuth)
+        _authService = FirebaseAuthentication(firebaseAuth)
     }
 }
 

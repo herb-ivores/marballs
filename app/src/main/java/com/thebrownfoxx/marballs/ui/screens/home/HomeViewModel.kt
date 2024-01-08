@@ -1,12 +1,12 @@
 package com.thebrownfoxx.marballs.ui.screens.home
 
 import androidx.lifecycle.ViewModel
-import com.thebrownfoxx.marballs.services.auth.AuthService
+import com.thebrownfoxx.marballs.services.authentication.Authentication
 
-class HomeViewModel(private val authService: AuthService): ViewModel() {
-    val loggedIn = authService.loggedIn
+class HomeViewModel(private val authentication: Authentication): ViewModel() {
+    val loggedIn = authentication.loggedIn
 
     fun logout() {
-        authService.logout()
+        authentication.logout()
     }
 }

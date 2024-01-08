@@ -2,16 +2,15 @@ package com.thebrownfoxx.marballs.ui.screens.signup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.thebrownfoxx.marballs.services.auth.AuthService
+import com.thebrownfoxx.marballs.services.authentication.Authentication
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.lang.Exception
 
-class SignupViewModel(private val authService: AuthService) : ViewModel() {
-    val loggedIn = authService.loggedIn
+class SignupViewModel(private val authentication: Authentication) : ViewModel() {
+    val loggedIn = authentication.loggedIn
 
     private val _errors = MutableSharedFlow<String>()
     val errors = _errors.asSharedFlow()
@@ -61,9 +60,9 @@ class SignupViewModel(private val authService: AuthService) : ViewModel() {
             return
         }
 
-        authService.signup(email, password) { signupResult ->
+        authentication.signup(email, password) { signupResult ->
             if (signupResult.isSuccess) {
-                authService.login(email, password) { loginResult ->
+                authentication.login(email, password) { loginResult ->
                     if (loginResult.isFailure) {
                         loginResult.exceptionOrNull().emitError()
                     }
