@@ -9,16 +9,22 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.thebrownfoxx.marballs.application
-import com.thebrownfoxx.marballs.ui.screens.destinations.LoginDestination
 
 @RootNavGraph
 @Destination
 @Composable
 fun Home(
     navigator: DestinationsNavigator,
-    viewModel: HomeViewModel = viewModel { HomeViewModel(application.authService) },
+    viewModel: HomeViewModel = viewModel {
+        HomeViewModel(
+            application.authService,
+            application.mapService,
+        )
+    },
 ) {
     with(viewModel) {
+        val currentLocation by currentLocation.collectAsStateWithLifecycle()
+
         val loggedIn by loggedIn.collectAsStateWithLifecycle()
 
         LaunchedEffect(loggedIn) {
@@ -28,6 +34,7 @@ fun Home(
         }
 
         HomeScreen(
+            currentLocation = currentLocation,
             onLogout = ::logout,
         )
     }
