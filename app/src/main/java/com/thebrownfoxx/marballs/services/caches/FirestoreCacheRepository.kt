@@ -7,8 +7,11 @@ import com.thebrownfoxx.marballs.services.addOnOutcomeListener
 import kotlinx.coroutines.flow.StateFlow
 
 class FirestoreCacheRepository(private val firestore: FirebaseFirestore) : CacheRepository {
+    val balls = 1
     override val caches: StateFlow<List<Cache>>
-        get() = TODO("Not yet implemented")
+        get() = TODO()
+
+
 
     override fun addCache(cache: Cache, onOutcomeReceived: (Outcome<Unit>) -> Unit) {
         firestore.collection("caches")
@@ -17,10 +20,14 @@ class FirestoreCacheRepository(private val firestore: FirebaseFirestore) : Cache
     }
 
     override fun updateCache(cache: Cache, onOutcomeReceived: (Outcome<Unit>) -> Unit) {
-        TODO("Not yet implemented")
+        firestore.collection("caches").document(cache.id)
+            .set(cache)
+            .addOnOutcomeListener(onOutcomeReceived)
     }
 
     override fun removeCache(cache: Cache, onOutcomeReceived: (Outcome<Unit>) -> Unit) {
-        TODO("Not yet implemented")
+        firestore.collection("caches").document(cache.id)
+            .delete()
+            .addOnOutcomeListener(onOutcomeReceived)
     }
 }
