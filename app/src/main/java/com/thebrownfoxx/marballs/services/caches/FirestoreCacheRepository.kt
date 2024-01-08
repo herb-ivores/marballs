@@ -7,7 +7,6 @@ import com.thebrownfoxx.marballs.services.addOnOutcomeListener
 import kotlinx.coroutines.flow.StateFlow
 
 class FirestoreCacheRepository(private val firestore: FirebaseFirestore) : CacheRepository {
-    val balls = 1
     override val caches: StateFlow<List<Cache>>
         get() = TODO()
 
