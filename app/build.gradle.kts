@@ -3,6 +3,7 @@ plugins {
     kotlin("android")
     kotlin("plugin.serialization")
     id("com.google.devtools.ksp") version "1.9.20-1.0.14"
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
     id("com.google.gms.google-services")
 }
 
@@ -51,6 +52,9 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+    }
+    secrets {
+        propertiesFileName = "secrets.properties"
     }
 }
 
@@ -121,4 +125,8 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth-ktx:22.3.0")
     implementation("com.google.firebase:firebase-firestore")
+
+    // Google Maps
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("com.google.maps.android:maps-compose:4.3.0")
 }
