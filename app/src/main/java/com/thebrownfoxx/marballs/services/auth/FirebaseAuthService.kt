@@ -1,34 +1,45 @@
 package com.thebrownfoxx.marballs.services.auth
 
 import com.google.firebase.auth.FirebaseAuth
+import com.thebrownfoxx.extensions.mapToStateFlow
+import com.thebrownfoxx.marballs.domain.User
 import com.thebrownfoxx.marballs.services.addOnResultListener
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class FirebaseAuthService(private val auth: FirebaseAuth): AuthService {
-    private val _loggedIn = MutableStateFlow(false)
-    override val loggedIn = _loggedIn.asStateFlow()
+class FirebaseAuthService(private val auth: FirebaseAuth) : AuthService {
+    private val scope = CoroutineScope(Dispatchers.Main)
 
-    private fun updateLoggedIn() {
-        _loggedIn.value = auth.currentUser != null
-    }
+    private val _currentUser = MutableStateFlow<User?>(null)
+    override val currentUser = _currentUser.asStateFlow()
 
-    override fun login(email: String, password: String, onResult: (Result<Unit>) -> Unit) {
-        auth.signInWithEmailAndPassword(email, password).addOnResultListener {
-            onResult(it)
-            updateLoggedIn()
-        }
+    override val loggedIn = currentUser.mapToStateFlow(scope = scope) { it != null }
+
+    private fun updateCurrentUser() {
+        val firebaseUser = auth.currentUser
+        _currentUser.value = User(
+            uid = firebaseUser?.uid ?: "",
+            email = firebaseUser?.email ?: "",
+        )
     }
 
     override fun signup(email: String, password: String, onResult: (Result<Unit>) -> Unit) {
         auth.createUserWithEmailAndPassword(email, password).addOnResultListener {
             onResult(it)
-            updateLoggedIn()
+        }
+    }
+
+    override fun login(email: String, password: String, onResult: (Result<Unit>) -> Unit) {
+        auth.signInWithEmailAndPassword(email, password).addOnResultListener {
+            onResult(it)
+            updateCurrentUser()
         }
     }
 
     override fun logout() {
         auth.signOut()
-        updateLoggedIn()
+        updateCurrentUser()
     }
 }
