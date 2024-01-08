@@ -2,6 +2,7 @@ package com.thebrownfoxx.marballs.ui.screens.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.thebrownfoxx.marballs.domain.Outcome
 import com.thebrownfoxx.marballs.services.authentication.Authentication
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,11 +45,9 @@ class LoginViewModel(private val authentication: Authentication) : ViewModel() {
             _loading.value = false
         } else {
             authentication.login(email, password) { loginResult ->
-                if (!loginResult.isSuccess) {
+                if (loginResult is Outcome.Failure) {
                     viewModelScope.launch {
-                        _errors.emit(
-                            loginResult.exceptionOrNull()?.message ?: "Unknown error"
-                        )
+                        _errors.emit(loginResult.throwableMessage)
                     }
                 }
                 _loading.value = false

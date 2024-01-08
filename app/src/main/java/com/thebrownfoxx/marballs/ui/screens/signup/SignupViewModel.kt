@@ -2,6 +2,7 @@ package com.thebrownfoxx.marballs.ui.screens.signup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.thebrownfoxx.marballs.domain.Outcome
 import com.thebrownfoxx.marballs.services.authentication.Authentication
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,12 +27,6 @@ class SignupViewModel(private val authentication: Authentication) : ViewModel() 
 
     private val _loading = MutableStateFlow(false)
     val loading = _loading.asStateFlow()
-
-    private fun Throwable?.emitError() {
-        viewModelScope.launch {
-            _errors.emit(this@emitError?.message ?: "Unknown error")
-        }
-    }
 
     fun setEmail(email: String) {
         _email.value = email
@@ -61,16 +56,19 @@ class SignupViewModel(private val authentication: Authentication) : ViewModel() 
         }
 
         authentication.signup(email, password) { signupResult ->
-            if (signupResult.isSuccess) {
-                authentication.login(email, password) { loginResult ->
-                    if (loginResult.isFailure) {
-                        loginResult.exceptionOrNull().emitError()
+            when (signupResult) {
+                is Outcome.Success ->
+                    authentication.login(email, password) { loginResult ->
+                        if (loginResult is Outcome.Failure) {
+                            viewModelScope.launch {
+                                _errors.emit(loginResult.throwableMessage)
+                            }
+                        }
+                        _loading.value = false
                     }
-                    _loading.value = false
-                }
-            } else {
-                viewModelScope.launch {
-                    signupResult.exceptionOrNull().emitError()
+
+                is Outcome.Failure -> viewModelScope.launch {
+                    _errors.emit(signupResult.throwableMessage)
                     _loading.value = false
                 }
             }
