@@ -1,17 +1,27 @@
 package com.thebrownfoxx.marballs.services.caches
 
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.snapshots
 import com.thebrownfoxx.marballs.domain.Cache
 import com.thebrownfoxx.marballs.domain.Outcome
 import com.thebrownfoxx.marballs.services.addOnOutcomeListener
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 
 class FirestoreCacheRepository(private val firestore: FirebaseFirestore) : CacheRepository {
+    private val _caches = MutableStateFlow<List<Cache>>(emptyList())
     override val caches: StateFlow<List<Cache>>
-        get() = TODO()
+        get() = _caches
+    init {
+        fetchCaches()
+    }
 
-
-
+    private fun fetchCaches() {
+        firestore.collection("tasks").snapshots().map { querySnapshot->
+            querySnapshot.toObjects(Cache::class.java)
+        }
+    }
     override fun addCache(cache: Cache, onOutcomeReceived: (Outcome<Unit>) -> Unit) {
         firestore.collection("caches")
             .add(cache)
