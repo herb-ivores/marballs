@@ -1,14 +1,17 @@
 package com.thebrownfoxx.marballs.services
 
 import com.google.android.gms.tasks.Task
+import com.thebrownfoxx.marballs.domain.Outcome
 
-fun <T> Task<T>.addOnResultListener(onResult: (Result<Unit>) -> Unit) {
+fun <T> Task<T>.addOnOutcomeListener(onOutcomeReceived: (Outcome<Unit>) -> Unit) {
     addOnCompleteListener { task ->
         if (task.isSuccessful) {
-            onResult(Result.success(Unit))
+            onOutcomeReceived(Outcome.Success())
+        } else {
+            onOutcomeReceived(Outcome.Failure(task.exception ?: Exception("Unknown exception")))
         }
     }
     addOnFailureListener { exception ->
-        onResult(Result.failure(exception))
+        onOutcomeReceived(Outcome.Failure(exception))
     }
 }
