@@ -25,6 +25,7 @@ class FirestoreCacheRepository(private val firestore: FirebaseFirestore) : Cache
     override fun addCache(cache: Cache, onOutcomeReceived: (Outcome<Unit>) -> Unit) {
 
         val cacheMap = mapOf(
+            "id" to cache.id,
             "name" to cache.name,
             "description" to cache.description,
             "location" to mapOf(
@@ -41,6 +42,7 @@ class FirestoreCacheRepository(private val firestore: FirebaseFirestore) : Cache
     override fun updateCache(cache: Cache, onOutcomeReceived: (Outcome<Unit>) -> Unit) {
 
         val cacheMap = mapOf(
+            "id" to cache.id,
             "name" to cache.name,
             "description" to cache.description,
             "location" to mapOf(
