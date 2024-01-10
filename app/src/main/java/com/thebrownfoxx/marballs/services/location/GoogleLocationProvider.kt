@@ -1,4 +1,4 @@
-package com.thebrownfoxx.marballs.services.map
+package com.thebrownfoxx.marballs.services.location
 
 import android.Manifest
 import android.app.Application

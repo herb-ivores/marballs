@@ -1,7 +1,6 @@
 package com.thebrownfoxx.marballs
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -16,11 +15,10 @@ import com.thebrownfoxx.marballs.services.authentication.Authentication
 import com.thebrownfoxx.marballs.services.authentication.DummyAuthentication
 import com.thebrownfoxx.marballs.services.cacheinfo.CacheInfoProvider
 import com.thebrownfoxx.marballs.services.cacheinfo.DummyCacheInfoProvider
-import com.thebrownfoxx.marballs.services.cacheinfo.PlacesFirebaseCacheInfoService
 import com.thebrownfoxx.marballs.services.caches.CacheRepository
 import com.thebrownfoxx.marballs.services.caches.DummyCacheRepository
-import com.thebrownfoxx.marballs.services.map.DummyLocationProvider
-import com.thebrownfoxx.marballs.services.map.LocationProvider
+import com.thebrownfoxx.marballs.services.location.DummyLocationProvider
+import com.thebrownfoxx.marballs.services.location.LocationProvider
 
 class MarballsApplication: Application() {
     private lateinit var firebaseAuth: FirebaseAuth
