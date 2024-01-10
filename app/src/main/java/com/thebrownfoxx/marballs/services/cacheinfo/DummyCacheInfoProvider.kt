@@ -3,6 +3,7 @@ package com.thebrownfoxx.marballs.services.cacheinfo
 import com.thebrownfoxx.marballs.domain.Cache
 import com.thebrownfoxx.marballs.domain.CacheInfo
 import com.thebrownfoxx.marballs.domain.Location
+import com.thebrownfoxx.marballs.domain.User
 import com.thebrownfoxx.marballs.extensions.distanceTo
 
 class DummyCacheInfoProvider: CacheInfoProvider {
