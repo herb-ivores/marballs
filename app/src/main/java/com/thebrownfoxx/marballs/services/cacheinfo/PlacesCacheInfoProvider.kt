@@ -30,6 +30,7 @@ class PlacesFirebaseCacheInfoService(
             location = "defaultLocation",
             distance = Distance(0.0),
             author = User("defaultId", "defaultEmail"),
+            coordinates = location
         )
 
         if (
@@ -60,7 +61,8 @@ class PlacesFirebaseCacheInfoService(
                             description = description,
                             location = "$locationName, $address",
                             distance = distance,
-                            author = auth.currentUser.value ?: author
+                            author = auth.currentUser.value ?: author,
+                            coordinates = location
                         )
                     }
                 }

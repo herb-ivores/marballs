@@ -22,6 +22,7 @@ import com.thebrownfoxx.components.FilledButton
 import com.thebrownfoxx.components.FilledTonalIconButton
 import com.thebrownfoxx.components.VerticalSpacer
 import com.thebrownfoxx.marballs.domain.CacheInfo
+import com.thebrownfoxx.marballs.domain.Location
 import com.thebrownfoxx.marballs.domain.User
 import com.thebrownfoxx.marballs.domain.meters
 import com.thebrownfoxx.marballs.ui.components.Info
@@ -98,7 +99,8 @@ fun CacheCardPreview() {
                 description = "Sussy baka hiding in the bushes.",
                 location = "Area 69",
                 distance = 69.0.meters,
-                author = User(uid = "1", email = "jonelespiritu@fuckers-online.io")
+                author = User(uid = "1", email = "jonelespiritu@fuckers-online.io"),
+                coordinates = Location(19.2132,121.3242)
             ),
             modifier = Modifier.padding(16.dp)
         )
@@ -117,6 +119,7 @@ fun CacheCardLongTextsPreview() {
                 description = "These are model dolls hidden in a chest. Please stop cumming on them. It's very difficult having to go back and clean all the sticky gunk you all left on my poor dolls.",
                 distance = 69.0.meters,
                 author = User(uid = "1", email = "jonelespiritu@fuckers-online.io"),
+                coordinates = Location(19.2132,121.3242)
             ),
             modifier = Modifier.padding(16.dp)
         )

@@ -150,6 +150,7 @@ fun MapScreenWithCachePreview() {
                 location = "Test Avenue, Test Tease City",
                 distance = 69.69.meters,
                 author = User(uid = "1", email = "jonelespiritu@fuckers-online.io"),
+                coordinates = Location(19.2132,121.3242)
             ),
             onResetLocation = {},
             onAddCache = {},
