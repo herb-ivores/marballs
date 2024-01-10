@@ -27,7 +27,7 @@ fun Main(
             application.authentication,
             application.locationProvider,
             application.cacheRepository,
-            application.cacheInfoService,
+            application.cacheInfoProvider,
         )
     },
 ) {

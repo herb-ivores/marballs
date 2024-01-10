@@ -8,12 +8,14 @@ import com.thebrownfoxx.marballs.extensions.distanceTo
 class DummyCacheInfoProvider: CacheInfoProvider {
     override fun Cache.toCacheInfo(currentLocation: Location): CacheInfo {
         return CacheInfo(
-            id = id ?: "DefaultID",
+            id = id ?: "defaultId",
             name = name,
             description = description,
             location = listOf("Area 69", "Test Tease City").random(),
             distance = currentLocation.distanceTo(location),
-            author = TODO(),
+            author = User("384", "hello@gmail.com"),
         )
     }
+
+    override fun Location.getLocationName() = "Area 69"
 }

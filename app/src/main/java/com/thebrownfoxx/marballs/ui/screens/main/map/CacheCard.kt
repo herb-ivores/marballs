@@ -10,23 +10,21 @@ import androidx.compose.material.icons.twotone.LocationOn
 import androidx.compose.material.icons.twotone.Navigation
 import androidx.compose.material.icons.twotone.Straighten
 import androidx.compose.material3.Card
-import androidx.compose.material3.Icon
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.thebrownfoxx.components.FilledButton
 import com.thebrownfoxx.components.FilledTonalIconButton
-import com.thebrownfoxx.components.HorizontalSpacer
 import com.thebrownfoxx.components.VerticalSpacer
 import com.thebrownfoxx.marballs.domain.CacheInfo
 import com.thebrownfoxx.marballs.domain.User
 import com.thebrownfoxx.marballs.domain.meters
+import com.thebrownfoxx.marballs.ui.components.Info
 import com.thebrownfoxx.marballs.ui.theme.AppTheme
 
 @Composable
@@ -34,7 +32,13 @@ fun CacheCard(
     cache: CacheInfo,
     modifier: Modifier = Modifier,
 ) {
-    Card(modifier = modifier) {
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.8f),
+            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        ),
+        modifier = modifier,
+    ) {
         Column(
             modifier = Modifier
                 .padding(horizontal = 8.dp)
@@ -80,26 +84,6 @@ fun CacheCard(
             }
             VerticalSpacer(height = 8.dp)
         }
-    }
-}
-
-@Composable
-private fun Info(
-    icon: ImageVector,
-    value: String,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier,
-    ) {
-        Icon(imageVector = icon, contentDescription = null)
-        HorizontalSpacer(width = 16.dp)
-        Text(
-            text = value,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
     }
 }
 
