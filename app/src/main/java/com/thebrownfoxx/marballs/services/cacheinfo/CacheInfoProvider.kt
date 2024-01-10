@@ -4,6 +4,6 @@ import com.thebrownfoxx.marballs.domain.Cache
 import com.thebrownfoxx.marballs.domain.CacheInfo
 import com.thebrownfoxx.marballs.domain.Location
 
-interface CacheInfoService {
+interface CacheInfoProvider {
     fun Cache.toCacheInfo(currentLocation: Location): CacheInfo
 }

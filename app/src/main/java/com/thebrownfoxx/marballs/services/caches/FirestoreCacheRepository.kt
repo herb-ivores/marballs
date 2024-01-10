@@ -6,13 +6,13 @@ import com.thebrownfoxx.marballs.domain.Cache
 import com.thebrownfoxx.marballs.domain.Outcome
 import com.thebrownfoxx.marballs.services.addOnOutcomeListener
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 
 class FirestoreCacheRepository(private val firestore: FirebaseFirestore) : CacheRepository {
-    private val _caches = MutableStateFlow<List<Cache>>(emptyList())
-    override val caches: StateFlow<List<Cache>>
-        get() = _caches
+    private val _caches = MutableStateFlow<List<Cache>?>(null)
+    override val caches = _caches.asStateFlow()
+
     init {
         fetchCaches()
     }

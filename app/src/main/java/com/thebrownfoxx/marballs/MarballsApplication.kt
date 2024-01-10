@@ -12,11 +12,11 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.thebrownfoxx.marballs.services.authentication.FirebaseAuthentication
-import com.thebrownfoxx.marballs.services.cacheinfo.CacheInfoService
-import com.thebrownfoxx.marballs.services.cacheinfo.DummyCacheInfoService
+import com.thebrownfoxx.marballs.services.cacheinfo.CacheInfoProvider
+import com.thebrownfoxx.marballs.services.cacheinfo.DummyCacheInfoProvider
 import com.thebrownfoxx.marballs.services.caches.CacheRepository
 import com.thebrownfoxx.marballs.services.caches.FirestoreCacheRepository
-import com.thebrownfoxx.marballs.services.map.GoogleMap
+import com.thebrownfoxx.marballs.services.map.GoogleLocationProvider
 
 class MarballsApplication: Application() {
     private lateinit var firebaseAuth: FirebaseAuth
@@ -24,7 +24,7 @@ class MarballsApplication: Application() {
     val authService get() = _authService
 
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-    private lateinit var _mapService: GoogleMap
+    private lateinit var _mapService: GoogleLocationProvider
     val mapService get() = _mapService
 
     private lateinit var firestore: FirebaseFirestore
@@ -32,8 +32,8 @@ class MarballsApplication: Application() {
     val cacheRepository get() = _cacheRepository
 
     private lateinit var placesClient: PlacesClient
-    private lateinit var _cacheInfoService: CacheInfoService
-    val cacheInfoService get() = _cacheInfoService
+    private lateinit var _cacheInfoProvider: CacheInfoProvider
+    val cacheInfoService get() = _cacheInfoProvider
 
     override fun onCreate() {
         super.onCreate()
@@ -42,7 +42,7 @@ class MarballsApplication: Application() {
 
         fusedLocationProviderClient = LocationServices
             .getFusedLocationProviderClient(applicationContext)
-        _mapService = GoogleMap(
+        _mapService = GoogleLocationProvider(
             fusedLocationClient = fusedLocationProviderClient,
             application = this,
         )
@@ -52,7 +52,7 @@ class MarballsApplication: Application() {
 
         Places.initializeWithNewPlacesApiEnabled(applicationContext, BuildConfig.MAPS_API_KEY)
         placesClient = Places.createClient(applicationContext)
-        _cacheInfoService = DummyCacheInfoService()
+        _cacheInfoProvider = DummyCacheInfoProvider()
     }
 }
 

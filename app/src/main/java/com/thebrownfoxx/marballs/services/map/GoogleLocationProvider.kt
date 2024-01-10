@@ -9,10 +9,10 @@ import com.thebrownfoxx.marballs.domain.Location
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class GoogleMap(
+class GoogleLocationProvider(
     private val fusedLocationClient: FusedLocationProviderClient,
     private val application: Application,
-) : Map {
+) : LocationProvider {
     private val _currentLocation = MutableStateFlow<Location?>(null)
     override val currentLocation = _currentLocation.asStateFlow()
 

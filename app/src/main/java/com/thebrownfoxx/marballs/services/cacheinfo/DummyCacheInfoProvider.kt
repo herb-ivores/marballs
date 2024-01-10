@@ -5,7 +5,7 @@ import com.thebrownfoxx.marballs.domain.CacheInfo
 import com.thebrownfoxx.marballs.domain.Location
 import com.thebrownfoxx.marballs.extensions.distanceTo
 
-class DummyCacheInfoService: CacheInfoService {
+class DummyCacheInfoProvider: CacheInfoProvider {
     override fun Cache.toCacheInfo(currentLocation: Location): CacheInfo {
         return CacheInfo(
             id = id,

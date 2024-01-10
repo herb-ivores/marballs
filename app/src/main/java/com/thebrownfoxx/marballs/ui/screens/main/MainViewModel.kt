@@ -6,17 +6,17 @@ import com.thebrownfoxx.extensions.combineToStateFlow
 import com.thebrownfoxx.marballs.domain.CacheInfo
 import com.thebrownfoxx.marballs.domain.Location
 import com.thebrownfoxx.marballs.services.authentication.Authentication
-import com.thebrownfoxx.marballs.services.cacheinfo.CacheInfoService
+import com.thebrownfoxx.marballs.services.cacheinfo.CacheInfoProvider
 import com.thebrownfoxx.marballs.services.caches.CacheRepository
-import com.thebrownfoxx.marballs.services.map.Map
+import com.thebrownfoxx.marballs.services.map.LocationProvider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class MainViewModel(
     private val authentication: Authentication,
-    private val map: Map,
+    private val locationProvider: LocationProvider,
     private val cacheRepository: CacheRepository,
-    private val cacheInfoService: CacheInfoService,
+    private val cacheInfoProvider: CacheInfoProvider,
 ): ViewModel() {
     val loggedIn = authentication.loggedIn
 
@@ -24,7 +24,7 @@ class MainViewModel(
     val currentScreen = _currentScreen.asStateFlow()
 
     init {
-        map.updateLocation()
+        locationProvider.updateLocation()
     }
 
     fun navigateTo(screen: MainScreen) {
@@ -36,23 +36,23 @@ class MainViewModel(
     }
 
     // Map screen
-    val currentLocation = map.currentLocation
+    val currentLocation = locationProvider.currentLocation
 
     private val _selectedCache = MutableStateFlow<CacheInfo?>(null)
     val selectedCache = _selectedCache.asStateFlow()
 
     fun resetLocation() {
-        map.updateLocation()
+        locationProvider.updateLocation()
     }
 
     // Caches screen
-    val caches = with(cacheInfoService) {
+    val caches = with(cacheInfoProvider) {
         combineToStateFlow(
             cacheRepository.caches,
-            map.currentLocation,
+            locationProvider.currentLocation,
             scope = viewModelScope,
         ) { caches, currentLocation ->
-            caches.map { cache ->
+            caches?.map { cache ->
                 cache.toCacheInfo(currentLocation ?: Location(0.0, 0.0))
             }
         }
