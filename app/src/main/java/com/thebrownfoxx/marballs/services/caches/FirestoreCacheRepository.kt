@@ -4,14 +4,12 @@ import com.thebrownfoxx.marballs.domain.Cache
 import com.thebrownfoxx.marballs.domain.Location
 import com.thebrownfoxx.marballs.domain.Outcome
 import com.thebrownfoxx.marballs.services.addOnOutcomeListener
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.tasks.await
 
 
 class FirestoreCacheRepository(private val firestore: FirebaseFirestore) : CacheRepository {
-    private val scope = CoroutineScope(Dispatchers.Main)
 
     private val _caches = MutableStateFlow<List<Cache>?>(null)
     override val caches = _caches.asStateFlow()
@@ -37,6 +35,23 @@ class FirestoreCacheRepository(private val firestore: FirebaseFirestore) : Cache
                     )
                 }
             }
+    }
+
+    override suspend fun getCache(cacheId: String): Cache {
+        val result = firestore.collection("caches")
+            .document(cacheId)
+            .get()
+            .await()
+        return  Cache(
+            id = result.id,
+            name = result.getString("name") ?: "",
+            description = result.getString("description") ?: "",
+            location = Location(
+                result.getDouble("latitude") ?: 0.0,
+                result.getDouble("longitude") ?: 0.0
+            ),
+            authorUid = result.getString("authorUid") ?: ""
+        )
     }
 
     override fun addCache(cache: Cache, onOutcomeReceived: (Outcome<Unit>) -> Unit) {

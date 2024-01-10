@@ -4,6 +4,8 @@ import com.thebrownfoxx.marballs.domain.Cache
 import com.thebrownfoxx.marballs.domain.Outcome
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlin.random.Random
 
@@ -14,6 +16,10 @@ class DummyCacheRepository: CacheRepository {
     override fun addCache(cache: Cache, onOutcomeReceived: (Outcome<Unit>) -> Unit) {
         _caches.update { it + cache.copy(id = Random.nextDouble().toString()) }
         onOutcomeReceived(Outcome.Success())
+    }
+
+    override suspend fun getCache(cacheId: String): Cache? {
+       return _caches.map { it.find { it.id == cacheId } }.firstOrNull()
     }
 
     override fun updateCache(cache: Cache, onOutcomeReceived: (Outcome<Unit>) -> Unit) {

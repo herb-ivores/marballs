@@ -17,31 +17,22 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class EditCacheViewModel(
-    private val authentication: Authentication,
     private val locationProvider: LocationProvider,
     private val cacheInfoProvider: CacheInfoProvider,
     private val cacheRepository: CacheRepository,
-    private val savedStateHandle: SavedStateHandle,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val cacheId = savedStateHandle.navArgs<CacheNavArgs>().CacheId
-
     private val _cache = MutableStateFlow<Cache?>(null)
     val cache: StateFlow<Cache?> = _cache.asStateFlow()
 
     init {
         viewModelScope.launch {
-            cacheRepository.caches
-                .map { caches ->
-                    caches?.find { it.id == cacheId }
-                }
-                .collect { cache ->
-                    _cache.emit(cache)
-                }
+            _cache.emit(cacheRepository.getCache(cacheId))
         }
     }
 
