@@ -63,8 +63,6 @@ class MarballsApplication: Application() {
         Places.initialize(applicationContext, BuildConfig.MAPS_API_KEY)
         placesClient = Places.createClient(applicationContext)
         _cacheInfoProvider = PlacesFirebaseCacheInfoService(placesClient, authentication, this)
-
-        _cacheRepository.addCache(Cache("aou", "Cache785", "Decsf", Location(15.1454993, 120.5923863), "authorIDAISODOSAd")) {}
     }
 }
 
