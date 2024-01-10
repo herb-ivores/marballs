@@ -1,20 +1,14 @@
 package com.thebrownfoxx.marballs.services.caches
-
-import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.snapshots
 import com.thebrownfoxx.marballs.domain.Cache
+import com.thebrownfoxx.marballs.domain.Location
 import com.thebrownfoxx.marballs.domain.Outcome
 import com.thebrownfoxx.marballs.services.addOnOutcomeListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
+
 
 class FirestoreCacheRepository(private val firestore: FirebaseFirestore) : CacheRepository {
     private val scope = CoroutineScope(Dispatchers.Main)
@@ -23,42 +17,67 @@ class FirestoreCacheRepository(private val firestore: FirebaseFirestore) : Cache
     override val caches = _caches.asStateFlow()
 
     init {
-        scope.launch {
-            fetchCaches()
-        }
+        updateCaches()
     }
 
-    suspend fun fetchCaches() {
-        firestore.collection("cache").snapshots().map { querySnapshot->
-            querySnapshot.toObjects(Cache::class.java)
-        }.collect{ _caches.value = it}
+    fun updateCaches() {
+        firestore.collection("caches")
+            .get()
+            .addOnSuccessListener { results ->
+                _caches.value = results.map {
+                    Cache(
+                        id = it.id,
+                        name = it.getString("name") ?: "",
+                        description = it.getString("description") ?: "",
+                        location = Location(
+                            it.getDouble("latitude") ?: 0.0,
+                            it.getDouble("longitude") ?: 0.0) ,
+                        authorUid = it.getString("authorUid") ?: ""
+
+                    )
+                }
+            }
     }
 
     override fun addCache(cache: Cache, onOutcomeReceived: (Outcome<Unit>) -> Unit) {
+        val cacheMap = mapOf(
+            "name" to cache.name,
+            "description" to cache.description,
+            "author" to cache.authorUid,
+            "latitude" to cache.location.latitude,
+            "longitude" to cache.location.longitude
 
-//        val cacheMap = mapOf(
-//            "name" to cache.name,
-//            "description" to cache.description,
-//            "author" to cache.authorUid,
-//            "latitude" to cache.location.latitude,
-//            "longitude" to cache.location.longitude
-//
-//        )
+        )
         firestore.collection("caches")
-            .add(cache)
-            .addOnOutcomeListener(onOutcomeReceived)
+            .add(cacheMap)
+            .addOnOutcomeListener{
+                if (it is Outcome.Success){
+                    updateCaches()
+                }
+                onOutcomeReceived(it)
+            }
     }
 
     override fun updateCache(cache: Cache, onOutcomeReceived: (Outcome<Unit>) -> Unit) {
 
         firestore.collection("caches").document(cache.id!!)
             .set(cache)
-            .addOnOutcomeListener(onOutcomeReceived)
+            .addOnOutcomeListener{
+                if (it is Outcome.Success){
+                    updateCaches()
+                }
+                onOutcomeReceived(it)
+            }
     }
 
     override fun removeCache(cache: Cache, onOutcomeReceived: (Outcome<Unit>) -> Unit) {
         firestore.collection("caches").document(cache.id!!)
             .delete()
-            .addOnOutcomeListener(onOutcomeReceived)
+            .addOnOutcomeListener{
+                if (it is Outcome.Success){
+                    updateCaches()
+                }
+                onOutcomeReceived(it)
+            }
     }
 }
