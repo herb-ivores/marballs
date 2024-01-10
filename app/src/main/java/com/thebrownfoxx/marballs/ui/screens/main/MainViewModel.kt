@@ -41,6 +41,14 @@ class MainViewModel(
     private val _selectedCache = MutableStateFlow<CacheInfo?>(null)
     val selectedCache = _selectedCache.asStateFlow()
 
+    val allowCacheEdit = combineToStateFlow(
+        authentication.currentUser,
+        selectedCache,
+        scope = viewModelScope,
+    ) { currentUser, selectedCache ->
+        currentUser == selectedCache?.author
+    }
+
     fun resetLocation() {
         locationProvider.updateLocation()
     }

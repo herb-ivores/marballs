@@ -15,6 +15,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.thebrownfoxx.components.extension.Zero
 import com.thebrownfoxx.marballs.application
 import com.thebrownfoxx.marballs.ui.screens.destinations.AddCacheDestination
+import com.thebrownfoxx.marballs.ui.screens.destinations.EditCacheDestination
 import com.thebrownfoxx.marballs.ui.screens.main.caches.CachesScreen
 import com.thebrownfoxx.marballs.ui.screens.main.map.MapScreen
 
@@ -34,8 +35,10 @@ fun Main(
 ) {
     with(viewModel) {
         val currentScreen by currentScreen.collectAsStateWithLifecycle()
+
         val currentLocation by currentLocation.collectAsStateWithLifecycle()
         val selectedCache by selectedCache.collectAsStateWithLifecycle()
+        val allowCacheEdit by allowCacheEdit.collectAsStateWithLifecycle()
         val caches by caches.collectAsStateWithLifecycle()
         val searchQuery by searchQuery.collectAsStateWithLifecycle()
 
@@ -60,6 +63,10 @@ fun Main(
                 MainScreen.Map -> MapScreen(
                     currentLocation = currentLocation,
                     selectedCache = selectedCache,
+                    allowCacheEdit = allowCacheEdit,
+                    onEditCache = {
+                        navigator.navigate(EditCacheDestination(selectedCache?.id!!))
+                    },
                     onResetLocation = ::resetLocation,
                     onAddCache = { navigator.navigate(AddCacheDestination) },
                     modifier = Modifier.padding(contentPadding),

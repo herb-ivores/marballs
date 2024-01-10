@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.twotone.Check
+import androidx.compose.material.icons.twotone.Edit
 import androidx.compose.material.icons.twotone.LocationOn
 import androidx.compose.material.icons.twotone.Navigation
 import androidx.compose.material.icons.twotone.Straighten
@@ -31,6 +32,8 @@ import com.thebrownfoxx.marballs.ui.theme.AppTheme
 @Composable
 fun CacheCard(
     cache: CacheInfo,
+    allowEdit: Boolean,
+    onEdit: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -71,6 +74,11 @@ fun CacheCard(
             VerticalSpacer(height = 16.dp)
             Row {
                 FilledTonalIconButton(
+                    imageVector = Icons.TwoTone.Edit,
+                    contentDescription = null,
+                    onClick = onEdit,
+                )
+                FilledTonalIconButton(
                     imageVector = Icons.TwoTone.Navigation,
                     contentDescription = null,
                     onClick = { /*TODO*/ },
@@ -102,6 +110,8 @@ fun CacheCardPreview() {
                 author = User(uid = "1", email = "jonelespiritu@fuckers-online.io"),
                 coordinates = Location(19.2132,121.3242)
             ),
+            allowEdit = true,
+            onEdit = {},
             modifier = Modifier.padding(16.dp)
         )
     }
@@ -121,6 +131,8 @@ fun CacheCardLongTextsPreview() {
                 author = User(uid = "1", email = "jonelespiritu@fuckers-online.io"),
                 coordinates = Location(19.2132,121.3242)
             ),
+            allowEdit = true,
+            onEdit = {},
             modifier = Modifier.padding(16.dp)
         )
     }

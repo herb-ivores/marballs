@@ -26,23 +26,25 @@ class EditCacheViewModel(
     private val locationProvider: LocationProvider,
     private val cacheInfoProvider: CacheInfoProvider,
     private val cacheRepository: CacheRepository,
-    private val savedStateHandle: SavedStateHandle
-): ViewModel() {
+    private val savedStateHandle: SavedStateHandle,
+) : ViewModel() {
     private val cacheId = savedStateHandle.navArgs<CacheNavArgs>().CacheId
 
     private val _cache = MutableStateFlow<Cache?>(null)
     val cache: StateFlow<Cache?> = _cache.asStateFlow()
-  init {
-      viewModelScope.launch {
-          cacheRepository.caches
-              .map { caches ->
-                  caches?.find { it.id == cacheId }
-              }
-              .collect{cache ->
-                  _cache.emit(cache)
-              }
-      }
-  }
+
+    init {
+        viewModelScope.launch {
+            cacheRepository.caches
+                .map { caches ->
+                    caches?.find { it.id == cacheId }
+                }
+                .collect { cache ->
+                    _cache.emit(cache)
+                }
+        }
+    }
+
     private val _loading = MutableStateFlow(false)
     val loading = _loading.asStateFlow()
 
