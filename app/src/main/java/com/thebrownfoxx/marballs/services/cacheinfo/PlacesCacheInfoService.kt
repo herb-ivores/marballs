@@ -38,18 +38,14 @@ class PlacesCacheInfoService(
                 .addOnSuccessListener { response: FindCurrentPlaceResponse ->
                     val placeLikelihoods = response.placeLikelihoods
                     if (placeLikelihoods.isNotEmpty()) {
-
                         val firstPlace = placeLikelihoods[0].place
-
                         val locationName = firstPlace.name.orEmpty()
                         val address = firstPlace.address.orEmpty()
                         val distance = currentLocation.distanceTo(location)
-
                         infoHolder = CacheInfo(id, name, description = description, location = "$locationName, $address", distance)
                     }
                 }
                 .addOnFailureListener { exception: Exception ->
-
                 }
         }
 
