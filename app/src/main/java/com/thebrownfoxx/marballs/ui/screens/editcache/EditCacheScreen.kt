@@ -11,6 +11,7 @@ import androidx.compose.material.icons.automirrored.twotone.ArrowBack
 import androidx.compose.material.icons.twotone.Add
 import androidx.compose.material.icons.twotone.FiberManualRecord
 import androidx.compose.material.icons.twotone.MyLocation
+import androidx.compose.material.icons.twotone.Save
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -103,8 +104,8 @@ fun EditCacheScreen(
                 location = locationName,
                 saveButton = {
                     FilledButton(
-                        icon = Icons.TwoTone.Add,
-                        text = "Add",
+                        icon = Icons.TwoTone.Save,
+                        text = "Save",
                         onClick = {
                             onUpdate(cameraPositionState.position.target.toLocation())
                         },
