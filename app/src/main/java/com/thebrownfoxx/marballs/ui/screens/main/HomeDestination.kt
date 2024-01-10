@@ -1,4 +1,4 @@
-package com.thebrownfoxx.marballs.ui.screens.home
+package com.thebrownfoxx.marballs.ui.screens.main
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -9,7 +9,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.thebrownfoxx.marballs.application
-import com.thebrownfoxx.marballs.ui.screens.home.map.MapScreen
+import com.thebrownfoxx.marballs.ui.screens.main.map.MapScreen
 
 @RootNavGraph
 @Destination

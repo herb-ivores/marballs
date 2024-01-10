@@ -1,4 +1,4 @@
-package com.thebrownfoxx.marballs.ui.screens.home
+package com.thebrownfoxx.marballs.ui.screens.main
 
 import androidx.lifecycle.ViewModel
 import com.thebrownfoxx.marballs.services.authentication.Authentication

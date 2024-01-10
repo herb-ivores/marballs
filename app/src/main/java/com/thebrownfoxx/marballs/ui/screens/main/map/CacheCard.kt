@@ -1,4 +1,4 @@
-package com.thebrownfoxx.marballs.ui.screens.home.map
+package com.thebrownfoxx.marballs.ui.screens.main.map
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -29,47 +30,37 @@ import com.thebrownfoxx.marballs.ui.theme.AppTheme
 
 @Composable
 fun CacheCard(
-    info: CacheInfo,
+    cache: CacheInfo,
     modifier: Modifier = Modifier,
 ) {
     Card(modifier = modifier) {
-        Column(modifier = Modifier.padding(horizontal = 8.dp)) {
+        Column(
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .fillMaxWidth(),
+        ) {
             VerticalSpacer(height = 16.dp)
             Column(modifier = Modifier.padding(horizontal = 8.dp)) {
                 Text(
-                    text = info.name,
+                    text = cache.name,
                     style = MaterialTheme.typography.titleLarge,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
                 VerticalSpacer(height = 8.dp)
-                Text(
-                    text = info.description,
-                    maxLines = 3,
-                    overflow = TextOverflow.Ellipsis,
-                )
+                Text(text = cache.description)
             }
             Column(modifier = Modifier.padding(horizontal = 12.dp)) {
                 VerticalSpacer(height = 16.dp)
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(imageVector = Icons.TwoTone.LocationOn, contentDescription = null)
-                    HorizontalSpacer(width = 16.dp)
-                    Text(
-                        text = info.location,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
+                Info(
+                    icon = Icons.TwoTone.LocationOn,
+                    value = cache.location,
+                )
                 VerticalSpacer(height = 8.dp)
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(imageVector = Icons.TwoTone.Straighten, contentDescription = null)
-                    HorizontalSpacer(width = 16.dp)
-                    Text(
-                        text = info.distance.toString(),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
+                Info(
+                    icon = Icons.TwoTone.Straighten,
+                    value = "${cache.distance}",
+                )
             }
             VerticalSpacer(height = 16.dp)
             Row {
@@ -91,12 +82,32 @@ fun CacheCard(
     }
 }
 
+@Composable
+private fun Info(
+    icon: ImageVector,
+    value: String,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier,
+    ) {
+        Icon(imageVector = icon, contentDescription = null)
+        HorizontalSpacer(width = 16.dp)
+        Text(
+            text = value,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
+
 @Preview
 @Composable
 fun CacheCardPreview() {
     AppTheme {
         CacheCard(
-            info = CacheInfo(
+            cache = CacheInfo(
                 id = "1",
                 name = "Huge Booty",
                 description = "Sussy baka hiding in the bushes.",
@@ -113,7 +124,7 @@ fun CacheCardPreview() {
 fun CacheCardLongTextsPreview() {
     AppTheme {
         CacheCard(
-            info = CacheInfo(
+            cache = CacheInfo(
                 id = "1",
                 name = "A quick sussy fox fucking a lazy dog",
                 location = "69th Floor, Area 69, Sussy Baka City, Sussy Baka Country, Sussy Baka Planet, Sussy Baka Galaxy, Sussy Baka Universe, Sussy Baka Multiverse, Sussy Baka Omniverse, Sussy Baka Megaverse, Sussy Baka Hyperverse, Sussy Baka Ultraverse, Sussy Baka Xenoverse, Sussy Baka Archverse, Sussy Baka Metaverse, Sussy Baka Ayashaverse, Sussy Baka Ayashiverse, Sussy Baka Ayashihyperverse, Sussy Baka Ayashiultraverse, Sussy Baka Ayashixenoverse, Sussy Baka Ayashiarchverse, Sussy Baka Ayashimetaverse, Sussy Baka Ayashimegaverse, Sussy Baka Ayashiomniverse, Sussy Baka",
