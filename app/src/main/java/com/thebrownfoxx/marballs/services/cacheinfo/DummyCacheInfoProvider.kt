@@ -8,7 +8,7 @@ import com.thebrownfoxx.marballs.extensions.distanceTo
 class DummyCacheInfoProvider: CacheInfoProvider {
     override fun Cache.toCacheInfo(currentLocation: Location): CacheInfo {
         return CacheInfo(
-            id = id,
+            id = id ?: "DefaultID",
             name = name,
             description = description,
             location = listOf("Area 69", "Test Tease City").random(),

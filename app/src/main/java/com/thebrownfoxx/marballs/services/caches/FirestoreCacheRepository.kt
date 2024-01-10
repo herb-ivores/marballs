@@ -29,14 +29,21 @@ class FirestoreCacheRepository(private val firestore: FirebaseFirestore) : Cache
     }
 
     suspend fun fetchCaches() {
-        firestore.collection("tasks").snapshots().map { querySnapshot->
+        firestore.collection("cache").snapshots().map { querySnapshot->
             querySnapshot.toObjects(Cache::class.java)
         }.collect{ _caches.value = it}
     }
 
-
     override fun addCache(cache: Cache, onOutcomeReceived: (Outcome<Unit>) -> Unit) {
 
+//        val cacheMap = mapOf(
+//            "name" to cache.name,
+//            "description" to cache.description,
+//            "author" to cache.authorUid,
+//            "latitude" to cache.location.latitude,
+//            "longitude" to cache.location.longitude
+//
+//        )
         firestore.collection("caches")
             .add(cache)
             .addOnOutcomeListener(onOutcomeReceived)
@@ -44,13 +51,13 @@ class FirestoreCacheRepository(private val firestore: FirebaseFirestore) : Cache
 
     override fun updateCache(cache: Cache, onOutcomeReceived: (Outcome<Unit>) -> Unit) {
 
-        firestore.collection("caches").document(cache.id)
+        firestore.collection("caches").document(cache.id!!)
             .set(cache)
             .addOnOutcomeListener(onOutcomeReceived)
     }
 
     override fun removeCache(cache: Cache, onOutcomeReceived: (Outcome<Unit>) -> Unit) {
-        firestore.collection("caches").document(cache.id)
+        firestore.collection("caches").document(cache.id!!)
             .delete()
             .addOnOutcomeListener(onOutcomeReceived)
     }

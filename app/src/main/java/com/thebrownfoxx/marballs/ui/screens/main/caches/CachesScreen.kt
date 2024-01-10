@@ -1,6 +1,7 @@
 package com.thebrownfoxx.marballs.ui.screens.main.caches
 // TODO: Rename namespace to com.herbivores.marballs
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -79,6 +80,7 @@ fun CachesScreen(
             ) { cache ->
                 CompactCacheCard(cache = cache, onClick = { onCacheSelect(cache) })
             }
+            Log.d("CachesScreen", "Caches size: ${caches.size}")
         }
     }
 }

@@ -56,7 +56,7 @@ class PlacesFirebaseCacheInfoService(
                         val distance = currentLocation.distanceTo(location)
                         val author = User("defaultUid", "defaultDisplayName")
                         infoHolder = CacheInfo(
-                            id = id,
+                            id = id ?: "DefaultID",
                             name = name,
                             description = description,
                             location = "$locationName, $address",
