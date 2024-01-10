@@ -1,4 +1,4 @@
-package com.thebrownfoxx.marballs.ui.screens.addcache
+package com.thebrownfoxx.marballs.ui.screens.editcache
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -11,6 +11,7 @@ import androidx.compose.material.icons.automirrored.twotone.ArrowBack
 import androidx.compose.material.icons.twotone.Add
 import androidx.compose.material.icons.twotone.FiberManualRecord
 import androidx.compose.material.icons.twotone.MyLocation
+import androidx.compose.material.icons.twotone.Save
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -31,6 +32,7 @@ import com.google.maps.android.compose.GoogleMap
 import com.thebrownfoxx.components.FilledButton
 import com.thebrownfoxx.components.IconButton
 import com.thebrownfoxx.components.extension.minus
+import com.thebrownfoxx.marballs.domain.Cache
 import com.thebrownfoxx.marballs.domain.Location
 import com.thebrownfoxx.marballs.extensions.toLatLng
 import com.thebrownfoxx.marballs.ui.components.EditableCacheCard
@@ -43,23 +45,21 @@ import kotlinx.coroutines.flow.emptyFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddCacheScreen(
-    name: String,
+fun EditCacheScreen(
+    cache: Cache,
     onNameChange: (String) -> Unit,
-    description: String,
     onDescriptionChange: (String) -> Unit,
-    location: Location,
     locationName: String,
     onResetLocation: () -> Unit,
-    onAdd: (Location) -> Unit,
+    onUpdate: (Location) -> Unit,
     errors: Flow<String>,
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val cameraPositionState = remember(location.key.toString()) {
+    val cameraPositionState = remember(cache.location.key.toString()) {
         CameraPositionState(
             position = CameraPosition.fromLatLngZoom(
-                location.toLatLng(),
+                cache.location.toLatLng(),
                 15f,
             ),
         )
@@ -70,7 +70,7 @@ fun AddCacheScreen(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    Text(text = "Add Cache")
+                    Text(text = "Edit Cache")
                 },
                 navigationIcon = {
                     IconButton(
@@ -97,17 +97,17 @@ fun AddCacheScreen(
         },
         bottomBar = {
             EditableCacheCard(
-                name = name,
+                name = cache.name,
                 onNameChange = onNameChange,
-                description = description,
+                description = cache.description,
                 onDescriptionChange = onDescriptionChange,
                 location = locationName,
                 saveButton = {
                     FilledButton(
-                        icon = Icons.TwoTone.Add,
-                        text = "Add",
+                        icon = Icons.TwoTone.Save,
+                        text = "Save",
                         onClick = {
-                            onAdd(cameraPositionState.position.target.toLocation())
+                            onUpdate(cameraPositionState.position.target.toLocation())
                         },
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -131,20 +131,21 @@ fun AddCacheScreen(
 
 @Preview
 @Composable
-fun AddCacheScreenPreview() {
+fun EditCacheScreenPreview() {
     AppTheme {
-        AddCacheScreen(
-            name = "Huge Booty",
-            onNameChange = {},
-            description = "Sussy baka hiding in the bushes.",
-            onDescriptionChange = {},
-            location = Location(
-                latitude = 0.0,
-                longitude = 0.0,
+        EditCacheScreen(
+            cache = Cache(
+                id = "ergsfvg",
+                name ="Name",
+                description = "asfwfqcasc",
+                location = Location(15.12321,120.21321),
+                authorUid = "AUTH325RGS",
             ),
+            onNameChange = {},
+            onDescriptionChange = {},
             locationName = "Area 69",
             onResetLocation = {},
-            onAdd = {},
+            onUpdate = {},
             errors = emptyFlow(),
             navigateUp = {},
         )

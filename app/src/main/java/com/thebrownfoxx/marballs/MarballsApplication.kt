@@ -1,7 +1,6 @@
 package com.thebrownfoxx.marballs
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -12,18 +11,18 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
-import com.thebrownfoxx.marballs.domain.Cache
-import com.thebrownfoxx.marballs.domain.Location
 import com.thebrownfoxx.marballs.services.authentication.Authentication
 import com.thebrownfoxx.marballs.services.authentication.DummyAuthentication
 import com.thebrownfoxx.marballs.services.cacheinfo.CacheInfoProvider
 import com.thebrownfoxx.marballs.services.cacheinfo.DummyCacheInfoProvider
-import com.thebrownfoxx.marballs.services.cacheinfo.PlacesFirebaseCacheInfoService
 import com.thebrownfoxx.marballs.services.caches.CacheRepository
 import com.thebrownfoxx.marballs.services.caches.DummyCacheRepository
-import com.thebrownfoxx.marballs.services.caches.FirestoreCacheRepository
-import com.thebrownfoxx.marballs.services.map.DummyLocationProvider
-import com.thebrownfoxx.marballs.services.map.LocationProvider
+import com.thebrownfoxx.marballs.services.findinfo.DummyFindInfoProvider
+import com.thebrownfoxx.marballs.services.findinfo.FindInfoProvider
+import com.thebrownfoxx.marballs.services.finds.DummyFindsRepository
+import com.thebrownfoxx.marballs.services.finds.FindsRepository
+import com.thebrownfoxx.marballs.services.location.DummyLocationProvider
+import com.thebrownfoxx.marballs.services.location.LocationProvider
 
 class MarballsApplication: Application() {
     private lateinit var firebaseAuth: FirebaseAuth
@@ -42,6 +41,12 @@ class MarballsApplication: Application() {
     private lateinit var _cacheInfoProvider: CacheInfoProvider
     val cacheInfoProvider get() = _cacheInfoProvider
 
+    private lateinit var _findsRepository: FindsRepository
+    val findsRepository get() = _findsRepository
+
+    private lateinit var _findInfoProvider: FindInfoProvider
+    val findInfoProvider get() = _findInfoProvider
+
     override fun onCreate() {
         super.onCreate()
         firebaseAuth = Firebase.auth
@@ -57,11 +62,19 @@ class MarballsApplication: Application() {
         _locationProvider = DummyLocationProvider()
 
         firestore = FirebaseFirestore.getInstance()
-        _cacheRepository = FirestoreCacheRepository(firestore)
-//        _cacheRepository = DummyCacheRepository()
+//        _cacheRepository = FirestoreCacheRepository(firestore)
+        _cacheRepository = DummyCacheRepository()
 
         Places.initialize(applicationContext, BuildConfig.MAPS_API_KEY)
         placesClient = Places.createClient(applicationContext)
+        _cacheInfoProvider = DummyCacheInfoProvider()
+
+        _findsRepository = DummyFindsRepository()
+
+        _findInfoProvider = DummyFindInfoProvider(
+            cacheRepository = cacheRepository,
+            cacheInfoProvider = cacheInfoProvider,
+        )
         _cacheInfoProvider = PlacesFirebaseCacheInfoService(placesClient, authentication, this)
     }
 }

@@ -1,7 +1,5 @@
-package com.thebrownfoxx.marballs.ui.screens.main.caches
-// TODO: Rename namespace to com.herbivores.marballs
+package com.thebrownfoxx.marballs.ui.screens.main.finds
 
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -26,18 +24,20 @@ import androidx.compose.ui.unit.dp
 import com.thebrownfoxx.components.IconButton
 import com.thebrownfoxx.components.extension.plus
 import com.thebrownfoxx.marballs.domain.CacheInfo
+import com.thebrownfoxx.marballs.domain.FindInfo
 import com.thebrownfoxx.marballs.domain.Location
 import com.thebrownfoxx.marballs.domain.User
 import com.thebrownfoxx.marballs.domain.meters
-import com.thebrownfoxx.marballs.ui.theme.AppTheme
+import java.time.Instant
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CachesScreen(
-    caches: List<CacheInfo>,
+fun FindsScreen(
+    finds: List<FindInfo>,
     searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
-    onCacheSelect: (CacheInfo) -> Unit,
+    onFindSelect: (FindInfo) -> Unit,
+    onunmarkFindAsFound: (FindInfo) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(modifier = modifier) { contentPadding ->
@@ -76,64 +76,70 @@ fun CachesScreen(
                 )
             }
             items(
-                items = caches,
+                items = finds,
                 key = { it.id },
-            ) { cache ->
-                CompactCacheCard(cache = cache, onClick = { onCacheSelect(cache) })
+            ) { find ->
+                FindCard(
+                    find = find,
+                    onClick = { onFindSelect(find) },
+                    onUnfind = { onunmarkFindAsFound(find) },
+                )
             }
-            Log.d("CachesScreen", "Caches size: ${caches.size}")
         }
     }
 }
 
 @Preview
 @Composable
-fun CachesScreenPreview() {
-    val author = User(uid = "1", email = "jonelespiritu@fuckmail.com")
-
-    AppTheme {
-        CachesScreen(
-            caches = listOf(
-                CacheInfo(
-                    id = "1",
-                    name = "Cache 1",
-                    description = "This is a cache",
-                    location = "Location 1",
-                    distance = 1.0.meters,
-                    author = author,
-                    coordinates = Location(19.2132,121.3242)
+fun FindsScreenPreview() {
+    FindsScreen(
+        finds = listOf(
+            FindInfo(
+                id = "fiehfie",
+                cache = CacheInfo(
+                    id = "uy3gur",
+                    name = "Cache name",
+                    description = "Cache description",
+                    coordinates = Location(0.0, 0.0),
+                    location = "Cache location",
+                    distance = 100.0.meters,
+                    author = User("uhu", "Hello"),
                 ),
-                CacheInfo(
-                    id = "2",
-                    name = "Cache 2",
-                    description = "This is a cache",
-                    location = "Location 2",
-                    distance = 2.0.meters,
-                    author = author,
-                    coordinates = Location(18.2132,122.3242)
-                ),
-                CacheInfo(
-                    id = "3",
-                    name = "Cache 3",
-                    description = "This is a cache",
-                    location = "Location 3",
-                    distance = 3.0.meters,
-                    author = author,
-                    coordinates = Location(17.2132,120.3242)
-                ),
-                CacheInfo(
-                    id = "4",
-                    name = "Cache 4",
-                    description = "This is a cache",
-                    location = "Location 4",
-                    distance = 4.0.meters,
-                    author = author,
-                    coordinates = Location(15.2132,115.3242)
-                ),
+                found = Instant.now(),
+                finder = User("ufhe", "fiuehfi"),
             ),
-            searchQuery = "",
-            onSearchQueryChange = {},
-            onCacheSelect = {},
-        )
-    }
+            FindInfo(
+                id = "4t44t4t",
+                cache = CacheInfo(
+                    id = "g4g4g34g",
+                    name = "Cache name",
+                    description = "Cache description",
+                    coordinates = Location(0.0, 0.0),
+                    location = "Cache location",
+                    distance = 100.0.meters,
+                    author = User("uhu", "Hello"),
+                ),
+                found = Instant.now(),
+                finder = User("ufhe", "fiuehfi"),
+            ),
+            FindInfo(
+                id = "g4g4g4g",
+                cache = CacheInfo(
+                    id = "g4g4g34g",
+                    name = "Cache name",
+                    description = "Cache description",
+                    coordinates = Location(0.0, 0.0),
+                    location = "Cache location",
+                    distance = 100.0.meters,
+                    author = User("uhu", "Hello"),
+                ),
+                found = Instant.now(),
+                finder = User("ufhe", "fiuehfi"),
+            ),
+        ),
+        searchQuery = "",
+        onSearchQueryChange = {},
+        onFindSelect = {},
+        onunmarkFindAsFound = {},
+    )
 }

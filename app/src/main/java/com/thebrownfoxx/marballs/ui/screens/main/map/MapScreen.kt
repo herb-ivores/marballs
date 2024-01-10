@@ -48,8 +48,13 @@ import com.thebrownfoxx.marballs.ui.theme.AppTheme
 fun MapScreen(
     currentLocation: Location?,
     selectedCache: CacheInfo?,
+    allowCacheEdit: Boolean,
+    selectedCacheFound: Boolean,
+    onMarkSelectedCacheAsFound: () -> Unit,
+    onUnmarkSelectedCacheAsFound: () -> Unit,
     onResetLocation: () -> Unit,
     onAddCache: () -> Unit,
+    onEditCache: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val cameraPositionState = remember(currentLocation?.key.toString()) {
@@ -113,6 +118,11 @@ fun MapScreen(
             if (selectedCache != null) {
                 CacheCard(
                     cache = selectedCache,
+                    allowEdit = allowCacheEdit,
+                    found = selectedCacheFound,
+                    onMarkAsFound = onMarkSelectedCacheAsFound,
+                    onUnmarkAsFound = onUnmarkSelectedCacheAsFound,
+                    onEdit = onEditCache,
                     modifier = Modifier
                         .padding(PaddingValues(16.dp) - PaddingValues(top = 16.dp)),
                 )
@@ -131,7 +141,12 @@ fun MapScreenPreview() {
         MapScreen(
             currentLocation = null,
             selectedCache = null,
+            allowCacheEdit = true,
+            selectedCacheFound = false,
+            onMarkSelectedCacheAsFound = {},
+            onUnmarkSelectedCacheAsFound = {},
             onResetLocation = {},
+            onEditCache = {},
             onAddCache = {},
         )
     }
@@ -150,7 +165,13 @@ fun MapScreenWithCachePreview() {
                 location = "Test Avenue, Test Tease City",
                 distance = 69.69.meters,
                 author = User(uid = "1", email = "jonelespiritu@fuckers-online.io"),
+                coordinates = Location(19.2132,121.3242)
             ),
+            allowCacheEdit = true,
+            selectedCacheFound = false,
+            onMarkSelectedCacheAsFound = {},
+            onUnmarkSelectedCacheAsFound = {},
+            onEditCache = {},
             onResetLocation = {},
             onAddCache = {},
         )
