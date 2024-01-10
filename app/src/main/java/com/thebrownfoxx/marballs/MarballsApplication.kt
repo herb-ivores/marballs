@@ -35,7 +35,7 @@ class MarballsApplication: Application() {
 
     private lateinit var placesClient: PlacesClient
     private lateinit var _cacheInfoProvider: CacheInfoProvider
-    val cacheInfoService get() = _cacheInfoProvider
+    val cacheInfoProvider get() = _cacheInfoProvider
 
     override fun onCreate() {
         super.onCreate()

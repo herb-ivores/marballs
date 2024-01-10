@@ -51,13 +51,13 @@ class FirestoreCacheRepository(private val firestore: FirebaseFirestore) : Cache
             )
         )
 
-        firestore.collection("caches").document(cache.id)
+        firestore.collection("caches").document(cache.id ?: "")
             .set(cacheMap)
             .addOnOutcomeListener(onOutcomeReceived)
     }
 
     override fun removeCache(cache: Cache, onOutcomeReceived: (Outcome<Unit>) -> Unit) {
-        firestore.collection("caches").document(cache.id)
+        firestore.collection("caches").document(cache.id ?: "")
             .delete()
             .addOnOutcomeListener(onOutcomeReceived)
     }

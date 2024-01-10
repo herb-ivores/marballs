@@ -14,7 +14,6 @@ import com.thebrownfoxx.marballs.domain.CacheInfo
 import com.thebrownfoxx.marballs.domain.Distance
 import com.thebrownfoxx.marballs.domain.Location
 import com.thebrownfoxx.marballs.extensions.distanceTo
-import com.thebrownfoxx.marballs.services.authentication.Authentication
 
 class PlacesFirebaseCacheInfoService(
     private val placesClient: PlacesClient,
@@ -54,7 +53,7 @@ class PlacesFirebaseCacheInfoService(
                         val address = firstPlace.address.orEmpty()
                         val distance = currentLocation.distanceTo(location)
                         infoHolder = CacheInfo(
-                            id = id,
+                            id = id ?: "defaultId",
                             name = name,
                             description = description,
                             location = "$locationName, $address",
@@ -68,5 +67,9 @@ class PlacesFirebaseCacheInfoService(
         }
 
         return infoHolder
+    }
+
+    override fun Location.getLocationName(): String {
+        TODO("Not yet implemented")
     }
 }

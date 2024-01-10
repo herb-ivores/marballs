@@ -6,4 +6,5 @@ import com.thebrownfoxx.marballs.domain.Location
 
 interface CacheInfoProvider {
     fun Cache.toCacheInfo(currentLocation: Location): CacheInfo
+    fun Location.getLocationName(): String
 }
