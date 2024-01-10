@@ -13,12 +13,13 @@ import com.thebrownfoxx.marballs.domain.Cache
 import com.thebrownfoxx.marballs.domain.CacheInfo
 import com.thebrownfoxx.marballs.domain.Distance
 import com.thebrownfoxx.marballs.domain.Location
+import com.thebrownfoxx.marballs.domain.User
 import com.thebrownfoxx.marballs.extensions.distanceTo
 import com.thebrownfoxx.marballs.services.authentication.Authentication
 
 class PlacesFirebaseCacheInfoService(
     private val placesClient: PlacesClient,
-    private val firebaseAuth: FirebaseAuth,
+    private val auth: Authentication,
     private val application: Application,
 ) : CacheInfoProvider {
 
@@ -29,7 +30,7 @@ class PlacesFirebaseCacheInfoService(
             description = "defaultDescription",
             location = "defaultLocation",
             distance = Distance(0.0),
-            author = TODO(),
+            author = User("defaultId", "defaultEmail"),
         )
 
         if (
@@ -53,13 +54,14 @@ class PlacesFirebaseCacheInfoService(
                         val locationName = firstPlace.name.orEmpty()
                         val address = firstPlace.address.orEmpty()
                         val distance = currentLocation.distanceTo(location)
+                        val author = User("defaultUid", "defaultDisplayName")
                         infoHolder = CacheInfo(
                             id = id,
                             name = name,
                             description = description,
                             location = "$locationName, $address",
                             distance = distance,
-                            author = TODO(),
+                            author = auth.currentUser.value ?: author
                         )
                     }
                 }
