@@ -1,11 +1,13 @@
 package com.thebrownfoxx.marballs.ui.screens.main.map
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.twotone.Check
+import androidx.compose.material.icons.twotone.Close
 import androidx.compose.material.icons.twotone.Edit
 import androidx.compose.material.icons.twotone.LocationOn
 import androidx.compose.material.icons.twotone.Navigation
@@ -20,6 +22,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.thebrownfoxx.components.FilledButton
+import com.thebrownfoxx.components.FilledTonalButton
 import com.thebrownfoxx.components.FilledTonalIconButton
 import com.thebrownfoxx.components.VerticalSpacer
 import com.thebrownfoxx.marballs.domain.CacheInfo
@@ -33,7 +36,10 @@ import com.thebrownfoxx.marballs.ui.theme.AppTheme
 fun CacheCard(
     cache: CacheInfo,
     allowEdit: Boolean,
+    found: Boolean,
     onEdit: () -> Unit,
+    onMarkAsFound: () -> Unit,
+    onUnmarkAsFound: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -73,23 +79,35 @@ fun CacheCard(
             }
             VerticalSpacer(height = 16.dp)
             Row {
-                FilledTonalIconButton(
-                    imageVector = Icons.TwoTone.Edit,
-                    contentDescription = null,
-                    onClick = onEdit,
-                )
+                AnimatedVisibility(visible = allowEdit) {
+                    FilledTonalIconButton(
+                        imageVector = Icons.TwoTone.Edit,
+                        contentDescription = null,
+                        onClick = onEdit,
+                    )
+                }
                 FilledTonalIconButton(
                     imageVector = Icons.TwoTone.Navigation,
                     contentDescription = null,
                     onClick = { /*TODO*/ },
                 )
-                FilledButton(
-                    icon = Icons.TwoTone.Check,
-                    iconContentDescription = null,
-                    text = "Mark as found",
-                    onClick = { /*TODO*/ },
-                    modifier = Modifier.fillMaxWidth(),
-                )
+                if (!found) {
+                    FilledButton(
+                        icon = Icons.TwoTone.Check,
+                        iconContentDescription = null,
+                        text = "Mark as found",
+                        onClick = onMarkAsFound,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                } else {
+                    FilledTonalButton(
+                        icon = Icons.TwoTone.Close,
+                        iconContentDescription = null,
+                        text = "Unmark as found",
+                        onClick = onUnmarkAsFound,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
             }
             VerticalSpacer(height = 8.dp)
         }
@@ -111,7 +129,10 @@ fun CacheCardPreview() {
                 coordinates = Location(19.2132,121.3242)
             ),
             allowEdit = true,
+            found = false,
             onEdit = {},
+            onMarkAsFound = {},
+            onUnmarkAsFound = {},
             modifier = Modifier.padding(16.dp)
         )
     }
@@ -132,8 +153,11 @@ fun CacheCardLongTextsPreview() {
                 coordinates = Location(19.2132,121.3242)
             ),
             allowEdit = true,
+            found = false,
             onEdit = {},
-            modifier = Modifier.padding(16.dp)
+            onMarkAsFound = {},
+            onUnmarkAsFound = {},
+            modifier = Modifier.padding(16.dp),
         )
     }
 }

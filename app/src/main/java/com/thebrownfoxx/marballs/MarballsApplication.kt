@@ -17,6 +17,10 @@ import com.thebrownfoxx.marballs.services.cacheinfo.CacheInfoProvider
 import com.thebrownfoxx.marballs.services.cacheinfo.DummyCacheInfoProvider
 import com.thebrownfoxx.marballs.services.caches.CacheRepository
 import com.thebrownfoxx.marballs.services.caches.DummyCacheRepository
+import com.thebrownfoxx.marballs.services.findinfo.DummyFindInfoProvider
+import com.thebrownfoxx.marballs.services.findinfo.FindInfoProvider
+import com.thebrownfoxx.marballs.services.finds.DummyFindsRepository
+import com.thebrownfoxx.marballs.services.finds.FindsRepository
 import com.thebrownfoxx.marballs.services.location.DummyLocationProvider
 import com.thebrownfoxx.marballs.services.location.LocationProvider
 
@@ -36,6 +40,12 @@ class MarballsApplication: Application() {
     private lateinit var placesClient: PlacesClient
     private lateinit var _cacheInfoProvider: CacheInfoProvider
     val cacheInfoProvider get() = _cacheInfoProvider
+
+    private lateinit var _findsRepository: FindsRepository
+    val findsRepository get() = _findsRepository
+
+    private lateinit var _findInfoProvider: FindInfoProvider
+    val findInfoProvider get() = _findInfoProvider
 
     override fun onCreate() {
         super.onCreate()
@@ -58,6 +68,13 @@ class MarballsApplication: Application() {
         Places.initializeWithNewPlacesApiEnabled(applicationContext, BuildConfig.MAPS_API_KEY)
         placesClient = Places.createClient(applicationContext)
         _cacheInfoProvider = DummyCacheInfoProvider()
+
+        _findsRepository = DummyFindsRepository()
+
+        _findInfoProvider = DummyFindInfoProvider(
+            cacheRepository = cacheRepository,
+            cacheInfoProvider = cacheInfoProvider,
+        )
     }
 }
 

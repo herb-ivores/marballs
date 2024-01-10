@@ -17,6 +17,7 @@ import com.thebrownfoxx.marballs.application
 import com.thebrownfoxx.marballs.ui.screens.destinations.AddCacheDestination
 import com.thebrownfoxx.marballs.ui.screens.destinations.EditCacheDestination
 import com.thebrownfoxx.marballs.ui.screens.main.caches.CachesScreen
+import com.thebrownfoxx.marballs.ui.screens.main.finds.FindsScreen
 import com.thebrownfoxx.marballs.ui.screens.main.map.MapScreen
 
 @RootNavGraph
@@ -30,6 +31,8 @@ fun Main(
             application.locationProvider,
             application.cacheRepository,
             application.cacheInfoProvider,
+            application.findsRepository,
+            application.findInfoProvider,
         )
     },
 ) {
@@ -39,8 +42,13 @@ fun Main(
         val currentLocation by currentLocation.collectAsStateWithLifecycle()
         val selectedCache by selectedCache.collectAsStateWithLifecycle()
         val allowCacheEdit by allowCacheEdit.collectAsStateWithLifecycle()
+        val selectedCacheFound by selectedCacheFound.collectAsStateWithLifecycle()
+
         val caches by caches.collectAsStateWithLifecycle()
-        val searchQuery by searchQuery.collectAsStateWithLifecycle()
+        val cachesSearchQuery by cachesSearchQuery.collectAsStateWithLifecycle()
+
+        val finds by finds.collectAsStateWithLifecycle()
+        val findsSearchQuery by findsSearchQuery.collectAsStateWithLifecycle()
 
         val loggedIn by loggedIn.collectAsStateWithLifecycle()
 
@@ -64,6 +72,9 @@ fun Main(
                     currentLocation = currentLocation,
                     selectedCache = selectedCache,
                     allowCacheEdit = allowCacheEdit,
+                    selectedCacheFound = selectedCacheFound,
+                    onMarkSelectedCacheAsFound = ::markSelectedCacheAsFound,
+                    onUnmarkSelectedCacheAsFound = ::unmarkSelectedCacheAsFound,
                     onEditCache = {
                         navigator.navigate(EditCacheDestination(selectedCache?.id!!))
                     },
@@ -73,10 +84,17 @@ fun Main(
                 )
                 MainScreen.Caches -> CachesScreen(
                     caches = caches ?: emptyList(),
-                    searchQuery = searchQuery,
-                    onSearchQueryChange = ::setSearchQuery,
+                    searchQuery = cachesSearchQuery,
+                    onSearchQueryChange = ::setCachesSearchQuery,
                     onCacheSelect = ::selectCache,
                     modifier = Modifier.padding(contentPadding),
+                )
+                MainScreen.Finds -> FindsScreen(
+                    finds = finds ?: emptyList(),
+                    searchQuery = findsSearchQuery,
+                    onSearchQueryChange = ::setFindsSearchQuery,
+                    onFindSelect = ::selectFind,
+                    onunmarkFindAsFound = ::unmarkFindAsFound,
                 )
                 else -> {}
             }
