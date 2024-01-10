@@ -17,7 +17,7 @@ import com.thebrownfoxx.marballs.ui.screens.destinations.SignupDestination
 @Composable
 fun Login(
     navigator: DestinationsNavigator,
-    viewModel: LoginViewModel = viewModel { LoginViewModel(application.authService) },
+    viewModel: LoginViewModel = viewModel { LoginViewModel(application.authentication) },
 ) {
     with(viewModel) {
         val email by email.collectAsStateWithLifecycle()

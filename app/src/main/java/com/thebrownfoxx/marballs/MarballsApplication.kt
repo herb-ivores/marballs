@@ -11,21 +11,23 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
-import com.thebrownfoxx.marballs.services.authentication.FirebaseAuthentication
+import com.thebrownfoxx.marballs.services.authentication.Authentication
+import com.thebrownfoxx.marballs.services.authentication.DummyAuthentication
 import com.thebrownfoxx.marballs.services.cacheinfo.CacheInfoProvider
 import com.thebrownfoxx.marballs.services.cacheinfo.DummyCacheInfoProvider
 import com.thebrownfoxx.marballs.services.caches.CacheRepository
-import com.thebrownfoxx.marballs.services.caches.FirestoreCacheRepository
-import com.thebrownfoxx.marballs.services.map.GoogleLocationProvider
+import com.thebrownfoxx.marballs.services.caches.DummyCacheRepository
+import com.thebrownfoxx.marballs.services.map.DummyLocationProvider
+import com.thebrownfoxx.marballs.services.map.LocationProvider
 
 class MarballsApplication: Application() {
     private lateinit var firebaseAuth: FirebaseAuth
-    private lateinit var _authService: FirebaseAuthentication
-    val authService get() = _authService
+    private lateinit var _authentication: Authentication
+    val authentication get() = _authentication
 
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-    private lateinit var _mapService: GoogleLocationProvider
-    val mapService get() = _mapService
+    private lateinit var _locationProvider: LocationProvider
+    val locationProvider get() = _locationProvider
 
     private lateinit var firestore: FirebaseFirestore
     private lateinit var _cacheRepository: CacheRepository
@@ -38,17 +40,20 @@ class MarballsApplication: Application() {
     override fun onCreate() {
         super.onCreate()
         firebaseAuth = Firebase.auth
-        _authService = FirebaseAuthentication(firebaseAuth)
+//        _authService = FirebaseAuthentication(firebaseAuth)
+        _authentication = DummyAuthentication()
 
         fusedLocationProviderClient = LocationServices
             .getFusedLocationProviderClient(applicationContext)
-        _mapService = GoogleLocationProvider(
-            fusedLocationClient = fusedLocationProviderClient,
-            application = this,
-        )
+//        _locationProvider = GoogleLocationProvider(
+//            fusedLocationClient = fusedLocationProviderClient,
+//            application = this,
+//        )
+        _locationProvider = DummyLocationProvider()
 
         firestore = FirebaseFirestore.getInstance()
-        _cacheRepository = FirestoreCacheRepository(firestore)
+//        _cacheRepository = FirestoreCacheRepository(firestore)
+        _cacheRepository = DummyCacheRepository()
 
         Places.initializeWithNewPlacesApiEnabled(applicationContext, BuildConfig.MAPS_API_KEY)
         placesClient = Places.createClient(applicationContext)

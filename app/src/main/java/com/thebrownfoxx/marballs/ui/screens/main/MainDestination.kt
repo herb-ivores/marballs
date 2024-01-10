@@ -24,8 +24,8 @@ fun Main(
     navigator: DestinationsNavigator,
     viewModel: MainViewModel = viewModel {
         MainViewModel(
-            application.authService,
-            application.mapService,
+            application.authentication,
+            application.locationProvider,
             application.cacheRepository,
             application.cacheInfoService,
         )

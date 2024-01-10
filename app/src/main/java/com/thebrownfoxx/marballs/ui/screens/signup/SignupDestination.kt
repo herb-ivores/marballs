@@ -13,7 +13,7 @@ import com.thebrownfoxx.marballs.application
 @Composable
 fun Signup(
     navigator: DestinationsNavigator,
-    viewModel: SignupViewModel = viewModel { SignupViewModel(application.authService) },
+    viewModel: SignupViewModel = viewModel { SignupViewModel(application.authentication) },
 ) {
     with(viewModel) {
         val email by email.collectAsStateWithLifecycle()
