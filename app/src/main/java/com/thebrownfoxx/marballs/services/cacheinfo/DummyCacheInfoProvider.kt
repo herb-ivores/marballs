@@ -13,6 +13,7 @@ class DummyCacheInfoProvider: CacheInfoProvider {
             description = description,
             location = listOf("Area 69", "Test Tease City").random(),
             distance = currentLocation.distanceTo(location),
+            author = TODO(),
         )
     }
 }

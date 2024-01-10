@@ -37,6 +37,7 @@ import com.thebrownfoxx.components.extension.minus
 import com.thebrownfoxx.marballs.R
 import com.thebrownfoxx.marballs.domain.CacheInfo
 import com.thebrownfoxx.marballs.domain.Location
+import com.thebrownfoxx.marballs.domain.User
 import com.thebrownfoxx.marballs.domain.meters
 import com.thebrownfoxx.marballs.extensions.toLatLng
 import com.thebrownfoxx.marballs.ui.theme.AppTheme
@@ -148,6 +149,7 @@ fun MapScreenWithCachePreview() {
                 description = "This is a sample cache.",
                 location = "Test Avenue, Test Tease City",
                 distance = 69.69.meters,
+                author = User(uid = "1", email = "jonelespiritu@fuckers-online.io"),
             ),
             onResetLocation = {},
             onAddCache = {},

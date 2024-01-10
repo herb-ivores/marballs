@@ -13,13 +13,23 @@ import com.thebrownfoxx.marballs.domain.CacheInfo
 import com.thebrownfoxx.marballs.domain.Distance
 import com.thebrownfoxx.marballs.domain.Location
 import com.thebrownfoxx.marballs.extensions.distanceTo
+import com.thebrownfoxx.marballs.services.authentication.Authentication
 
 class PlacesCacheInfoService(
     private val placesClient: PlacesClient,
-    private val application: Application) : CacheInfoService {
+    private val authentication: Authentication,
+    private val application: Application,
+) : CacheInfoProvider {
 
     override fun Cache.toCacheInfo(currentLocation: Location): CacheInfo {
-        var infoHolder = CacheInfo("defaultId", "defaultName", "defaultDescription", "defaultLocation", Distance(0.0))
+        var infoHolder = CacheInfo(
+            id = "defaultId",
+            name = "defaultName",
+            description = "defaultDescription",
+            location = "defaultLocation",
+            distance = Distance(0.0),
+            author = TODO(),
+        )
 
         if (
             ContextCompat.checkSelfPermission(
@@ -42,7 +52,14 @@ class PlacesCacheInfoService(
                         val locationName = firstPlace.name.orEmpty()
                         val address = firstPlace.address.orEmpty()
                         val distance = currentLocation.distanceTo(location)
-                        infoHolder = CacheInfo(id, name, description = description, location = "$locationName, $address", distance)
+                        infoHolder = CacheInfo(
+                            id = id,
+                            name = name,
+                            description = description,
+                            location = "$locationName, $address",
+                            distance = distance,
+                            author = TODO(),
+                        )
                     }
                 }
                 .addOnFailureListener { exception: Exception ->

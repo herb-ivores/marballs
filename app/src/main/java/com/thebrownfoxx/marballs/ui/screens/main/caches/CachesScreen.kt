@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.thebrownfoxx.components.IconButton
 import com.thebrownfoxx.components.extension.plus
 import com.thebrownfoxx.marballs.domain.CacheInfo
+import com.thebrownfoxx.marballs.domain.User
 import com.thebrownfoxx.marballs.domain.meters
 import com.thebrownfoxx.marballs.ui.theme.AppTheme
 
@@ -85,6 +86,8 @@ fun CachesScreen(
 @Preview
 @Composable
 fun CachesScreenPreview() {
+    val author = User(uid = "1", email = "jonelespiritu@fuckmail.com")
+
     AppTheme {
         CachesScreen(
             caches = listOf(
@@ -94,6 +97,7 @@ fun CachesScreenPreview() {
                     description = "This is a cache",
                     location = "Location 1",
                     distance = 1.0.meters,
+                    author = author,
                 ),
                 CacheInfo(
                     id = "2",
@@ -101,6 +105,7 @@ fun CachesScreenPreview() {
                     description = "This is a cache",
                     location = "Location 2",
                     distance = 2.0.meters,
+                    author = author,
                 ),
                 CacheInfo(
                     id = "3",
@@ -108,6 +113,7 @@ fun CachesScreenPreview() {
                     description = "This is a cache",
                     location = "Location 3",
                     distance = 3.0.meters,
+                    author = author,
                 ),
                 CacheInfo(
                     id = "4",
@@ -115,6 +121,7 @@ fun CachesScreenPreview() {
                     description = "This is a cache",
                     location = "Location 4",
                     distance = 4.0.meters,
+                    author = author,
                 ),
             ),
             searchQuery = "",

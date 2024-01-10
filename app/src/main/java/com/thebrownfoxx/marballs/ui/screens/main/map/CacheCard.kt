@@ -25,6 +25,7 @@ import com.thebrownfoxx.components.FilledTonalIconButton
 import com.thebrownfoxx.components.HorizontalSpacer
 import com.thebrownfoxx.components.VerticalSpacer
 import com.thebrownfoxx.marballs.domain.CacheInfo
+import com.thebrownfoxx.marballs.domain.User
 import com.thebrownfoxx.marballs.domain.meters
 import com.thebrownfoxx.marballs.ui.theme.AppTheme
 
@@ -113,6 +114,7 @@ fun CacheCardPreview() {
                 description = "Sussy baka hiding in the bushes.",
                 location = "Area 69",
                 distance = 69.0.meters,
+                author = User(uid = "1", email = "jonelespiritu@fuckers-online.io")
             ),
             modifier = Modifier.padding(16.dp)
         )
@@ -130,6 +132,7 @@ fun CacheCardLongTextsPreview() {
                 location = "69th Floor, Area 69, Sussy Baka City, Sussy Baka Country, Sussy Baka Planet, Sussy Baka Galaxy, Sussy Baka Universe, Sussy Baka Multiverse, Sussy Baka Omniverse, Sussy Baka Megaverse, Sussy Baka Hyperverse, Sussy Baka Ultraverse, Sussy Baka Xenoverse, Sussy Baka Archverse, Sussy Baka Metaverse, Sussy Baka Ayashaverse, Sussy Baka Ayashiverse, Sussy Baka Ayashihyperverse, Sussy Baka Ayashiultraverse, Sussy Baka Ayashixenoverse, Sussy Baka Ayashiarchverse, Sussy Baka Ayashimetaverse, Sussy Baka Ayashimegaverse, Sussy Baka Ayashiomniverse, Sussy Baka",
                 description = "These are model dolls hidden in a chest. Please stop cumming on them. It's very difficult having to go back and clean all the sticky gunk you all left on my poor dolls.",
                 distance = 69.0.meters,
+                author = User(uid = "1", email = "jonelespiritu@fuckers-online.io"),
             ),
             modifier = Modifier.padding(16.dp)
         )

@@ -5,4 +5,5 @@ data class Cache(
     val name: String,
     val description: String,
     val location: Location,
+    val authorUid: String,
 )

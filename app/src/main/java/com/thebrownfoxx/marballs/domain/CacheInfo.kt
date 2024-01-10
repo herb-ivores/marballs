@@ -6,4 +6,5 @@ data class CacheInfo(
     val description: String,
     val location: String,
     val distance: Distance,
+    val author: User,
 )
