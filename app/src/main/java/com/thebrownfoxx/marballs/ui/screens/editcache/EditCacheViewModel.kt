@@ -32,17 +32,18 @@ class EditCacheViewModel(
 
     private val _cache = MutableStateFlow<Cache?>(null)
     val cache: StateFlow<Cache?> = _cache.asStateFlow()
-  init {
-      viewModelScope.launch {
-          cacheRepository.caches
-              .map { caches ->
-                  caches?.find { it.id == cacheId }
-              }
-              .collect{cache ->
-                  _cache.emit(cache)
-              }
-      }
-  }
+
+    init {
+        viewModelScope.launch {
+            cacheRepository.caches
+                .map { caches ->
+                    caches?.find { it.id == cacheId }
+                }
+                .collect { cache ->
+                    _cache.emit(cache)
+                }
+        }
+    }
     private val _loading = MutableStateFlow(false)
     val loading = _loading.asStateFlow()
 
