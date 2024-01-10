@@ -70,7 +70,7 @@ fun EditCacheScreen(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    Text(text = "Add Cache")
+                    Text(text = "Edit Cache")
                 },
                 navigationIcon = {
                     IconButton(
