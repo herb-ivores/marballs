@@ -8,6 +8,7 @@ import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse
 import com.google.android.libraries.places.api.net.PlacesClient
+import com.google.firebase.auth.FirebaseAuth
 import com.thebrownfoxx.marballs.domain.Cache
 import com.thebrownfoxx.marballs.domain.CacheInfo
 import com.thebrownfoxx.marballs.domain.Distance
@@ -15,9 +16,9 @@ import com.thebrownfoxx.marballs.domain.Location
 import com.thebrownfoxx.marballs.extensions.distanceTo
 import com.thebrownfoxx.marballs.services.authentication.Authentication
 
-class PlacesCacheInfoService(
+class PlacesFirebaseCacheInfoService(
     private val placesClient: PlacesClient,
-    private val authentication: Authentication,
+    private val firebaseAuth: FirebaseAuth,
     private val application: Application,
 ) : CacheInfoProvider {
 
