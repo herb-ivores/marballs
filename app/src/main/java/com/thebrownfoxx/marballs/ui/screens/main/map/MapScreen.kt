@@ -51,7 +51,7 @@ fun MapScreen(
     onAddCache: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val cameraPositionState = remember(currentLocation.toString()) {
+    val cameraPositionState = remember(currentLocation?.key.toString()) {
         CameraPositionState(
             position = CameraPosition.fromLatLngZoom(
                 currentLocation?.toLatLng() ?: LatLng(0.0, 0.0),

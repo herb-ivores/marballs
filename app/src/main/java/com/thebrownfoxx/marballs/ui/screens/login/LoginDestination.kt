@@ -9,7 +9,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.thebrownfoxx.marballs.application
-import com.thebrownfoxx.marballs.ui.screens.destinations.HomeDestination
+import com.thebrownfoxx.marballs.ui.screens.destinations.MainDestination
 import com.thebrownfoxx.marballs.ui.screens.destinations.SignupDestination
 
 @RootNavGraph(start = true)
@@ -28,7 +28,7 @@ fun Login(
 
         LaunchedEffect(loggedIn) {
             if (loggedIn) {
-                navigator.navigate(HomeDestination)
+                navigator.navigate(MainDestination)
             }
         }
 
