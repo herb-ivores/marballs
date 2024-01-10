@@ -11,14 +11,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
-import com.thebrownfoxx.marballs.domain.Cache
-import com.thebrownfoxx.marballs.domain.Location
 import com.thebrownfoxx.marballs.services.authentication.Authentication
 import com.thebrownfoxx.marballs.services.authentication.DummyAuthentication
 import com.thebrownfoxx.marballs.services.cacheinfo.CacheInfoProvider
-import com.thebrownfoxx.marballs.services.cacheinfo.DummyCacheInfoProvider
+import com.thebrownfoxx.marballs.services.cacheinfo.PlacesFirebaseCacheInfoService
 import com.thebrownfoxx.marballs.services.caches.CacheRepository
-import com.thebrownfoxx.marballs.services.caches.DummyCacheRepository
 import com.thebrownfoxx.marballs.services.caches.FirestoreCacheRepository
 import com.thebrownfoxx.marballs.services.map.DummyLocationProvider
 import com.thebrownfoxx.marballs.services.map.LocationProvider
@@ -59,10 +56,10 @@ class MarballsApplication: Application() {
 //        _cacheRepository = DummyCacheRepository()
 
         Places.initializeWithNewPlacesApiEnabled(applicationContext, BuildConfig.MAPS_API_KEY)
-        placesClient = Places.createClient(applicationContext)
+        placesClient = Places.createClient(this)
         _cacheInfoProvider = PlacesFirebaseCacheInfoService(placesClient, authentication, this)
-
-        _cacheRepository.addCache(Cache("ao8u", "Cache5", "Descsf", Location(15.1454993, 120.5923863), "authorIDAISODOSAd")) {}
+//
+//        _cacheRepository.addCache(Cache("ao8u", "Cache5", "Descsf", Location(15.1454993, 120.5923863), "authorIDAISODOSAd")) {}
     }
 }
 
