@@ -1,6 +1,7 @@
 package com.thebrownfoxx.marballs
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -17,6 +18,7 @@ import com.thebrownfoxx.marballs.services.authentication.Authentication
 import com.thebrownfoxx.marballs.services.authentication.DummyAuthentication
 import com.thebrownfoxx.marballs.services.cacheinfo.CacheInfoProvider
 import com.thebrownfoxx.marballs.services.cacheinfo.DummyCacheInfoProvider
+import com.thebrownfoxx.marballs.services.cacheinfo.PlacesFirebaseCacheInfoService
 import com.thebrownfoxx.marballs.services.caches.CacheRepository
 import com.thebrownfoxx.marballs.services.caches.DummyCacheRepository
 import com.thebrownfoxx.marballs.services.caches.FirestoreCacheRepository
@@ -60,10 +62,9 @@ class MarballsApplication: Application() {
 
         Places.initializeWithNewPlacesApiEnabled(applicationContext, BuildConfig.MAPS_API_KEY)
         placesClient = Places.createClient(applicationContext)
-        _cacheInfoProvider = DummyCacheInfoProvider()
+        _cacheInfoProvider = PlacesFirebaseCacheInfoService(placesClient, authentication, this)
 
-        _cacheRepository.addCache(Cache("aoud8u", "Cache1", "Desc29as09ahsf", Location(15.1454993, 120.5923863), "authorIDAISODOSAd")) {}
-
+        _cacheRepository.addCache(Cache("ao8u", "Cache5", "Descsf", Location(15.1454993, 120.5923863), "authorIDAISODOSAd")) {}
     }
 }
 
