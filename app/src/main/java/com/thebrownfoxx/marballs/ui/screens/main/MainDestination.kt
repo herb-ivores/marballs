@@ -64,7 +64,7 @@ fun Main(
                     modifier = Modifier.padding(contentPadding),
                 )
                 MainScreen.Caches -> CachesScreen(
-                    caches = caches,
+                    caches = caches ?: emptyList(),
                     searchQuery = searchQuery,
                     onSearchQueryChange = ::setSearchQuery,
                     onCacheSelect = ::selectCache,
