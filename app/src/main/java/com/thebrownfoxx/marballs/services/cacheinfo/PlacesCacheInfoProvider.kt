@@ -2,13 +2,24 @@ package com.thebrownfoxx.marballs.services.cacheinfo
 
 import android.Manifest
 import android.app.Application
+import android.content.ContentValues.TAG
 import android.content.pm.PackageManager
+import android.location.Geocoder
 import android.util.Log
 import androidx.core.content.ContextCompat
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.api.net.FetchPlaceRequest
+import com.google.android.libraries.places.api.net.FetchPlaceResponse
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse
 import com.google.android.libraries.places.api.net.PlacesClient
+import com.google.gson.GsonBuilder
+import com.google.maps.GeoApiContext
+import com.google.maps.GeocodingApi
+import com.google.maps.model.GeocodingResult
+import com.thebrownfoxx.marballs.BuildConfig
 import com.thebrownfoxx.marballs.domain.Cache
 import com.thebrownfoxx.marballs.domain.CacheInfo
 import com.thebrownfoxx.marballs.domain.Distance
@@ -16,9 +27,13 @@ import com.thebrownfoxx.marballs.domain.Location
 import com.thebrownfoxx.marballs.domain.User
 import com.thebrownfoxx.marballs.extensions.distanceTo
 import com.thebrownfoxx.marballs.services.authentication.Authentication
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import kotlin.random.Random
 
-infix fun Boolean.AND(other: Boolean) = this&& other
+
+infix fun Boolean.AND(other: Boolean) = this && other
 
 class PlacesFirebaseCacheInfoService(
     private val placesClient: PlacesClient,
@@ -28,7 +43,6 @@ class PlacesFirebaseCacheInfoService(
 
 
     override fun Cache.toCacheInfo(currentLocation: Location): CacheInfo {
-        Log.d("PlacesFirebaseCacheInfoService", "Hello1")
         var infoHolder = CacheInfo(
             id = Random.nextLong().toString(),
             name = "defaultName",
@@ -49,40 +63,78 @@ class PlacesFirebaseCacheInfoService(
         ) {
             return infoHolder
         }
-        val findCurrentPlaceRequest =
-            FindCurrentPlaceRequest.newInstance(listOf(Place.Field.ADDRESS, Place.Field.NAME))
-        Log.d("PlacesFirebaseCacheInfoService", "hello: $findCurrentPlaceRequest")
-        placesClient.findCurrentPlace(findCurrentPlaceRequest)
-            .addOnSuccessListener { response: FindCurrentPlaceResponse ->
-                val placeLikelihoods = response.placeLikelihoods
-                if (placeLikelihoods.isNotEmpty()) {
-                    val firstPlace = placeLikelihoods[0].place
-                    val locationName = firstPlace.name.orEmpty()
-                    val address = firstPlace.address.orEmpty()
-                    val distance = currentLocation.distanceTo(location)
-                    val author = User("defaultUid", "defaultDisplayName")
-                    infoHolder = CacheInfo(
-                        id = id ?: "DefaultID",
-                        name = name,
-                        description = description,
-                        location = "$locationName, $address",
-                        distance = distance,
-                        author = auth.currentUser.value ?: author
-                    )
-                    Log.d("PlacesFirebaseCacheInfoService", "Number of place likelihoods: ${placeLikelihoods.size}")
-                }
-                else{
-                    Log.d("PlacesFirebaseCacheInfoService", "Else invoked")
-                }
+
+        val latitude = location.latitude
+        val longitude = location.longitude
+
+        val latLng = LatLng(latitude, longitude)
+
+        Log.d("PlacesFirebaseCacheInfoService", "Latitude: $latitude, Longitude: $longitude")
+
+        val placeId = runBlocking {
+            getPlaceId(latLng)
+        }
+
+
+        val placeFields = listOf(Place.Field.ID, Place.Field.NAME)
+
+        Log.d(this::class.simpleName, "placeID: $placeId")
+        val request = FetchPlaceRequest.newInstance(placeId, placeFields)
+
+        placesClient.fetchPlace(request)
+            .addOnSuccessListener { response: FetchPlaceResponse ->
+                val place = response.place
+                Log.i("PlacesFirebaseCacheInfoService", "Place found: ${place.name}")
+                val locationName = place.name.orEmpty()
+                Log.d("PlacesFirebaseCacheInfoService", "Current Location: $currentLocation, Location: $location")
+                val distance = currentLocation.distanceTo(location)
+                val author = User("defaultUid", "defaultDisplayName")
+                Log.i("PlacesFirebaseCacheInfoService", "CacheInfo: $locationName, $distance, $author")
+                infoHolder = CacheInfo(
+                    id = id ?: "DefaultID",
+                    name = name,
+                    description = description,
+                    location = locationName,
+                    distance = distance,
+                    author = auth.currentUser.value ?: author
+                )
             }
             .addOnFailureListener { exception: Exception ->
                 Log.e("PlacesFirebaseCacheInfoService", "Error finding current place", exception)
             }
-        Log.d("PlacesFirebaseCacheInfoService", "Returning infoHolder: $infoHolder")
+        Log.d("PlacesFirebaseCacheInfoService", "Returning successful infoHolder: $infoHolder")
         return infoHolder
     }
 
+    suspend fun getPlaceId(locationLatLng: LatLng): String {
+        return withContext(Dispatchers.IO) {
+            val context = GeoApiContext.Builder()
+                .apiKey(BuildConfig.MAPS_API_KEY)
+                .build()
+
+            try {
+                val results = GeocodingApi.geocode(context, locationLatLng.latitude.toString() + "," + locationLatLng.longitude.toString()).await()
+                if (results.isNotEmpty()) {
+                    val placeId = results[0].placeId
+                    val gson = GsonBuilder().setPrettyPrinting().create()
+                    Log.d("PlacesFirebaseCacheInfoService", "Geocoding results: ${gson.toJson(results)}")
+                    return@withContext placeId
+                } else {
+                    Log.d("PlacesFirebaseCacheInfoService", "No results found for the given coordinates.")
+                }
+            } catch (e: Exception) {
+                Log.e("PlacesFirebaseCacheInfoService", "Error fetching place details: ${e.message}")
+            } finally {
+                // Invoke .shutdown() after your application is done making requests
+                context.shutdown()
+            }
+
+            return@withContext ""
+        }
+    }
+
+
     override fun Location.getLocationName(): String {
-        TODO("Not yet implemented")
+       return ""
     }
 }
