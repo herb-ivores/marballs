@@ -5,13 +5,14 @@ import com.thebrownfoxx.marballs.domain.Outcome
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlin.random.Random
 
 class DummyCacheRepository: CacheRepository {
     private val _caches = MutableStateFlow(emptyList<Cache>())
     override val caches = _caches.asStateFlow()
 
     override fun addCache(cache: Cache, onOutcomeReceived: (Outcome<Unit>) -> Unit) {
-        _caches.update { it + cache }
+        _caches.update { it + cache.copy(id = Random.nextDouble().toString()) }
         onOutcomeReceived(Outcome.Success())
     }
 

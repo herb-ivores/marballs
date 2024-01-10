@@ -22,6 +22,8 @@ class AddCacheViewModel(
     private val cacheInfoProvider: CacheInfoProvider,
     private val cacheRepository: CacheRepository,
 ) : ViewModel() {
+    val loggedIn = authentication.loggedIn
+
     private val _successful = MutableSharedFlow<Unit>()
     val successful = _successful.asSharedFlow()
 
@@ -34,14 +36,11 @@ class AddCacheViewModel(
     private val _description = MutableStateFlow("")
     val description = _description.asStateFlow()
 
-    private val _location = MutableStateFlow(
-        locationProvider.currentLocation.value ?: Location(0.0, 0.0)
-    )
-    val location = _location.asStateFlow()
+    val location = locationProvider.currentLocation
 
     val locationName = location.mapToStateFlow(scope = viewModelScope) {
         with(cacheInfoProvider) {
-            it.getLocationName()
+            (it ?: Location(0.0, 0.0)).getLocationName()
         }
     }
 
@@ -56,22 +55,15 @@ class AddCacheViewModel(
         _description.value = description
     }
 
-    fun setLocation(location: Location) {
-        _location.value = location
-    }
-
     fun resetLocation() {
         locationProvider.updateLocation()
-        _location.value = locationProvider.currentLocation.value
-            ?: Location(0.0, 0.0)
     }
 
-    fun add() {
+    fun add(location: Location) {
         _loading.value = true
 
         val name = name.value
         val description = description.value
-        val location = location.value
 
         if (name.isBlank() || description.isBlank()) {
             viewModelScope.launch {

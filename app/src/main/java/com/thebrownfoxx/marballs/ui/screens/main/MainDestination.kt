@@ -14,6 +14,7 @@ import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.thebrownfoxx.components.extension.Zero
 import com.thebrownfoxx.marballs.application
+import com.thebrownfoxx.marballs.ui.screens.destinations.AddCacheDestination
 import com.thebrownfoxx.marballs.ui.screens.main.caches.CachesScreen
 import com.thebrownfoxx.marballs.ui.screens.main.map.MapScreen
 
@@ -60,7 +61,7 @@ fun Main(
                     currentLocation = currentLocation,
                     selectedCache = selectedCache,
                     onResetLocation = ::resetLocation,
-                    onAddCache = {},
+                    onAddCache = { navigator.navigate(AddCacheDestination) },
                     modifier = Modifier.padding(contentPadding),
                 )
                 MainScreen.Caches -> CachesScreen(
