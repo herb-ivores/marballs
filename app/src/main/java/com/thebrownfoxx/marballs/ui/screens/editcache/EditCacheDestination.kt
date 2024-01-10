@@ -16,7 +16,6 @@ fun EditCache(
     navigator: DestinationsNavigator,
     viewModel: EditCacheViewModel = viewModel{
         EditCacheViewModel(
-            application.authentication,
             application.locationProvider,
             application.cacheInfoProvider,
             application.cacheRepository,
