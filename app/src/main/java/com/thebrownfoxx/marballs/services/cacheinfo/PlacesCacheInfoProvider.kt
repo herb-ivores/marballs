@@ -33,6 +33,7 @@ class PlacesFirebaseCacheInfoService(
             id = Random.nextLong().toString(),
             name = "defaultName",
             description = "defaultDescription",
+            coordinates = location,
             location = "defaultLocation",
             distance = Distance(0.0),
             author = User("defaultId", "defaultEmail"),
@@ -66,6 +67,7 @@ class PlacesFirebaseCacheInfoService(
                         name = name,
                         description = description,
                         location = "$locationName, $address",
+                        coordinates = location,
                         distance = distance,
                         author = auth.currentUser.value ?: author
                     )

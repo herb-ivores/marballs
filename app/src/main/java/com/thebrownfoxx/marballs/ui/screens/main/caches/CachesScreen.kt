@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.thebrownfoxx.components.IconButton
 import com.thebrownfoxx.components.extension.plus
 import com.thebrownfoxx.marballs.domain.CacheInfo
+import com.thebrownfoxx.marballs.domain.Location
 import com.thebrownfoxx.marballs.domain.User
 import com.thebrownfoxx.marballs.domain.meters
 import com.thebrownfoxx.marballs.ui.theme.AppTheme
@@ -100,6 +101,7 @@ fun CachesScreenPreview() {
                     location = "Location 1",
                     distance = 1.0.meters,
                     author = author,
+                    coordinates = Location(19.2132,121.3242)
                 ),
                 CacheInfo(
                     id = "2",
@@ -108,6 +110,7 @@ fun CachesScreenPreview() {
                     location = "Location 2",
                     distance = 2.0.meters,
                     author = author,
+                    coordinates = Location(18.2132,122.3242)
                 ),
                 CacheInfo(
                     id = "3",
@@ -116,6 +119,7 @@ fun CachesScreenPreview() {
                     location = "Location 3",
                     distance = 3.0.meters,
                     author = author,
+                    coordinates = Location(17.2132,120.3242)
                 ),
                 CacheInfo(
                     id = "4",
@@ -124,6 +128,7 @@ fun CachesScreenPreview() {
                     location = "Location 4",
                     distance = 4.0.meters,
                     author = author,
+                    coordinates = Location(15.2132,115.3242)
                 ),
             ),
             searchQuery = "",
