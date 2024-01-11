@@ -211,7 +211,8 @@ class MainViewModel(
     val finds = combine(
         findsSearchQuery,
         findsRepository.finds,
-    ) { searchQuery, finds ->
+        currentUser,
+    ) { searchQuery, finds, currentUser ->
         val outcomes = with(findInfoProvider) {
             finds?.map { find ->
                 find.toFindInfo()
@@ -223,6 +224,7 @@ class MainViewModel(
             outcomes.filterIsInstance<Outcome.Success<FindInfo>>()
                 .map { it.data }
                 .search(searchQuery) { it.cache.name }
+                .filter { it.finder.uid == currentUser?.uid }
         }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
