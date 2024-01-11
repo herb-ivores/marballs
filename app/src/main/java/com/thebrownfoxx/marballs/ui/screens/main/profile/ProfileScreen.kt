@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -15,6 +15,7 @@ import androidx.compose.material.icons.twotone.Refresh
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -53,41 +54,45 @@ fun ProfileScreen(
     onLogout: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    if (finds.isNotEmpty()) {
-        val topAppBarScrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-        Scaffold(
-            topBar = {
-                CenterAlignedTopAppBar(
-                    title = {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = Icons.TwoTone.Person,
-                                contentDescription = null,
-                            )
-                            HorizontalSpacer(width = 8.dp)
-                            Text(text = currentUser.username)
-                        }
-                    },
-                    navigationIcon = {
-                        IconButton(
-                            imageVector = Icons.TwoTone.Refresh,
+    val topAppBarScrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.TwoTone.Person,
                             contentDescription = null,
-                            onClick = onReload,
                         )
-                    },
-                    actions = {
-                        IconButton(
-                            imageVector = Icons.AutoMirrored.TwoTone.Logout,
-                            contentDescription = null,
-                            onClick = onLogout,
-                        )
-                    },
-                    scrollBehavior = topAppBarScrollBehavior,
-                )
-            },
-            modifier = modifier.nestedScroll(topAppBarScrollBehavior.nestedScrollConnection),
-        ) { contentPadding ->
-            val topPadding = contentPadding.top + 16.dp
+                        HorizontalSpacer(width = 8.dp)
+                        Text(text = currentUser.username)
+                    }
+                },
+                navigationIcon = {
+                    IconButton(
+                        imageVector = Icons.TwoTone.Refresh,
+                        contentDescription = null,
+                        onClick = onReload,
+                    )
+                },
+                actions = {
+                    IconButton(
+                        imageVector = Icons.AutoMirrored.TwoTone.Logout,
+                        contentDescription = null,
+                        onClick = onLogout,
+                    )
+                },
+                scrollBehavior = topAppBarScrollBehavior,
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
+                ),
+            )
+        },
+        modifier = modifier.nestedScroll(topAppBarScrollBehavior.nestedScrollConnection),
+    ) { contentPadding ->
+        val topPadding = contentPadding.top + 16.dp
+
+        if (finds.isNotEmpty()) {
             LazyColumn(
                 contentPadding = contentPadding + PaddingValues(16.dp) -
                         PaddingValues(top = topPadding),
@@ -114,9 +119,9 @@ fun ProfileScreen(
                     )
                 }
             }
+        } else {
+            EmptyScreen(modifier = modifier.padding(contentPadding))
         }
-    } else {
-        EmptyScreen(modifier = modifier.systemBarsPadding())
     }
 }
 

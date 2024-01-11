@@ -105,7 +105,6 @@ fun AddCacheScreen(
                 onNameChange = onNameChange,
                 description = description,
                 onDescriptionChange = onDescriptionChange,
-                location = locationName,
                 saveButton = {
                     AnimatedVisibility(visible = loading) {
                         LinearProgressIndicator(

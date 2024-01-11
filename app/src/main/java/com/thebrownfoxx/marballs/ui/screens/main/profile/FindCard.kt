@@ -64,7 +64,7 @@ fun FindCard(
             FilledTonalButton(
                 icon = Icons.TwoTone.Close,
                 iconContentDescription = null,
-                text = "Unmark as found",
+                text = "Not found",
                 onClick = onUnfind,
                 modifier = Modifier.fillMaxWidth(),
             )

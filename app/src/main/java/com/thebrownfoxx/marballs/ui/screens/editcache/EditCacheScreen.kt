@@ -104,7 +104,6 @@ fun EditCacheScreen(
                 onNameChange = onNameChange,
                 description = cache.description,
                 onDescriptionChange = onDescriptionChange,
-                location = locationName,
                 saveButton = {
                     AnimatedVisibility(visible = loading) {
                         LinearProgressIndicator(

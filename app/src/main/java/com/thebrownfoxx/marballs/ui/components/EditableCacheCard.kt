@@ -3,8 +3,6 @@ package com.thebrownfoxx.marballs.ui.components
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.twotone.LocationOn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -24,13 +22,12 @@ fun EditableCacheCard(
     onNameChange: (String) -> Unit,
     description: String,
     onDescriptionChange: (String) -> Unit,
-    location: String,
     saveButton: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.8f),
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.9f),
             contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
         ),
         modifier = modifier,
@@ -58,13 +55,6 @@ fun EditableCacheCard(
                     modifier = Modifier.fillMaxWidth(),
                 )
             }
-            Column(modifier = Modifier.padding(horizontal = 12.dp)) {
-                VerticalSpacer(height = 16.dp)
-                Info(
-                    icon = Icons.TwoTone.LocationOn,
-                    value = location,
-                )
-            }
             VerticalSpacer(height = 16.dp)
             saveButton()
             VerticalSpacer(height = 8.dp)
@@ -81,7 +71,6 @@ fun EditableCacheCardPreview() {
             onNameChange = {},
             description = "Cache Description",
             onDescriptionChange = {},
-            location = "Cache Location",
             saveButton = {
                 FilledButton(
                     text = "Save",

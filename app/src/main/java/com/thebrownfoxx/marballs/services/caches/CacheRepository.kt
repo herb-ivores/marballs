@@ -10,5 +10,5 @@ interface CacheRepository {
     suspend fun getCache(cacheId: String): Outcome<Cache?>
     suspend fun addCache(cache: Cache): Outcome<Unit>
     suspend fun updateCache(cache: Cache): Outcome<Unit>
-    suspend fun removeCache(cache: Cache): Outcome<Unit>
+    suspend fun removeCache(cacheId: String): Outcome<Unit>
 }

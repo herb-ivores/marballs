@@ -89,8 +89,8 @@ class FirestoreCacheRepository(private val firestore: FirebaseFirestore) : Cache
             .also { updateCaches() }
     }
 
-    override suspend fun removeCache(cache: Cache): Outcome<Unit> = withContext(Dispatchers.IO) {
-        return@withContext firestore.collection("caches").document(cache.id!!)
+    override suspend fun removeCache(cacheId: String): Outcome<Unit> = withContext(Dispatchers.IO) {
+        return@withContext firestore.collection("caches").document(cacheId)
             .delete()
             .awaitOutcome()
             .map { }

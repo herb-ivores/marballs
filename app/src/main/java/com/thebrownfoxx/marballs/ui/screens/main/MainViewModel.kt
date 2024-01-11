@@ -1,5 +1,6 @@
 package com.thebrownfoxx.marballs.ui.screens.main
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.thebrownfoxx.extensions.combineToStateFlow
@@ -32,6 +33,9 @@ class MainViewModel(
     private val findsRepository: FindsRepository,
     private val findInfoProvider: FindInfoProvider,
 ) : ViewModel() {
+    private val _errors = MutableSharedFlow<String>()
+    val errors = _errors.asSharedFlow()
+
     val loggedIn = authentication.loggedIn
 
     val currentUser = authentication.currentUser
@@ -74,6 +78,9 @@ class MainViewModel(
         finds?.any { it.cacheId == selectedCache?.id && it.finderId == currentUser?.uid } ?: false
     }
 
+    private val _deleteDialogVisible = MutableStateFlow(false)
+    val deleteDialogVisible = _deleteDialogVisible.asStateFlow()
+
     fun markSelectedCacheAsFound() {
         val selectedCache = selectedCache.value
         val currentUser = authentication.currentUser.value
@@ -88,7 +95,7 @@ class MainViewModel(
                 )
                 if (outcome is Outcome.Failure) {
                     viewModelScope.launch {
-                        _findsErrors.emit(outcome.throwableMessage)
+                        _errors.emit(outcome.throwableMessage)
                     }
                 }
             }
@@ -99,20 +106,35 @@ class MainViewModel(
         val selectedCache = selectedCache.value
         val currentUser = authentication.currentUser.value
         if (selectedCache != null && currentUser != null) {
-//            findsRepository.removeFind(selectedCache.id) { outcome ->
-//                if (outcome is Outcome.Failure) {
-//                    viewModelScope.launch {
-//                        _findsErrors.emit(outcome.throwableMessage)
-//                    }
-//                }
-//            }
             viewModelScope.launch {
                 val outcome = findsRepository.removeFind(selectedCache.id)
                 if (outcome is Outcome.Failure) {
-                    viewModelScope.launch {
-                        _findsErrors.emit(outcome.throwableMessage)
-                    }
+                    _errors.emit(outcome.throwableMessage)
                 }
+            }
+        }
+    }
+
+    fun initiateDeleteCache() {
+        if (selectedCache.value != null) {
+            _deleteDialogVisible.value = true
+        }
+    }
+
+    fun cancelDeleteCache() {
+        _deleteDialogVisible.value = false
+    }
+
+    fun deleteCache() {
+        val selectedCache = selectedCache.value
+        if (selectedCache != null) {
+            viewModelScope.launch {
+                val outcome = cacheRepository.removeCache(selectedCache.id)
+                if (outcome is Outcome.Failure) {
+                    _errors.emit(outcome.throwableMessage)
+                }
+                _deleteDialogVisible.value = false
+                _selectedCache.value = null
             }
         }
     }
@@ -128,11 +150,11 @@ class MainViewModel(
     val cachesSearchQuery = _cachesSearchQuery.asStateFlow()
 
     val caches = combine(
-        reload,
         cachesSearchQuery,
         cacheRepository.caches,
         locationProvider.currentLocation,
-    ) { _, searchQuery, caches, currentLocation ->
+    ) { searchQuery, caches, currentLocation ->
+        Log.d(this::class.simpleName, "caches: $caches")
         val outcomes = with(cacheInfoProvider) {
             caches?.map { cache ->
                 cache.toCacheInfo(
@@ -158,18 +180,13 @@ class MainViewModel(
         _selectedCache.value = cache
     }
 
-    // Profile screen
-    private val _findsErrors = MutableSharedFlow<String>()
-    val findsErrors = _findsErrors.asSharedFlow()
-
     private val _findsSearchQuery = MutableStateFlow("")
     val findsSearchQuery = _findsSearchQuery.asStateFlow()
 
     val finds = combine(
-        reload,
         findsSearchQuery,
         findsRepository.finds,
-    ) { _, searchQuery, finds ->
+    ) { searchQuery, finds ->
         val outcomes = with(findInfoProvider) {
             finds?.map { find ->
                 find.toFindInfo()
@@ -198,7 +215,7 @@ class MainViewModel(
             val outcome = findsRepository.removeFind(find.cache.id)
             if (outcome is Outcome.Failure) {
                 viewModelScope.launch {
-                    _findsErrors.emit(outcome.throwableMessage)
+                    _errors.emit(outcome.throwableMessage)
                 }
             }
         }

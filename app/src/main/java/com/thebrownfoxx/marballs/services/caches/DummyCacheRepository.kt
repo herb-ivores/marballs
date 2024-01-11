@@ -39,10 +39,10 @@ class DummyCacheRepository: CacheRepository {
         return outcome
     }
 
-    override suspend fun removeCache(cache: Cache): Outcome<Unit> {
+    override suspend fun removeCache(cacheId: String): Outcome<Unit> {
         var outcome: Outcome<Unit> = Outcome.Success()
         _caches.update { caches ->
-            val oldCache = caches.firstOrNull { it.id == cache.id }
+            val oldCache = caches.firstOrNull { it.id == cacheId }
             if (oldCache != null) {
                 caches - oldCache
             } else {

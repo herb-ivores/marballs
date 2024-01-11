@@ -1,6 +1,5 @@
 package com.thebrownfoxx.marballs.ui.screens.main.map
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,12 +7,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.twotone.Check
 import androidx.compose.material.icons.twotone.Close
+import androidx.compose.material.icons.twotone.Delete
 import androidx.compose.material.icons.twotone.Edit
 import androidx.compose.material.icons.twotone.LocationOn
 import androidx.compose.material.icons.twotone.Navigation
 import androidx.compose.material.icons.twotone.Straighten
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,13 +39,14 @@ fun CacheCard(
     allowEdit: Boolean,
     found: Boolean,
     onEdit: () -> Unit,
+    onDelete: () -> Unit,
     onMarkAsFound: () -> Unit,
     onUnmarkAsFound: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.8f),
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.9f),
             contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
         ),
         modifier = modifier,
@@ -79,7 +81,16 @@ fun CacheCard(
             }
             VerticalSpacer(height = 16.dp)
             Row {
-                AnimatedVisibility(visible = allowEdit) {
+                if (allowEdit) {
+                    FilledTonalIconButton(
+                        imageVector = Icons.TwoTone.Delete,
+                        contentDescription = null,
+                        onClick = onDelete,
+                        colors = IconButtonDefaults.filledTonalIconButtonColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer,
+                            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                        )
+                    )
                     FilledTonalIconButton(
                         imageVector = Icons.TwoTone.Edit,
                         contentDescription = null,
@@ -95,7 +106,7 @@ fun CacheCard(
                     FilledButton(
                         icon = Icons.TwoTone.Check,
                         iconContentDescription = null,
-                        text = "Mark as found",
+                        text = "Found",
                         onClick = onMarkAsFound,
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -103,7 +114,7 @@ fun CacheCard(
                     FilledTonalButton(
                         icon = Icons.TwoTone.Close,
                         iconContentDescription = null,
-                        text = "Unmark as found",
+                        text = "Not found",
                         onClick = onUnmarkAsFound,
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -131,6 +142,7 @@ fun CacheCardPreview() {
             allowEdit = true,
             found = false,
             onEdit = {},
+            onDelete = {},
             onMarkAsFound = {},
             onUnmarkAsFound = {},
             modifier = Modifier.padding(16.dp)
@@ -155,6 +167,7 @@ fun CacheCardLongTextsPreview() {
             allowEdit = true,
             found = false,
             onEdit = {},
+            onDelete = {},
             onMarkAsFound = {},
             onUnmarkAsFound = {},
             modifier = Modifier.padding(16.dp),

@@ -15,7 +15,9 @@ import androidx.compose.ui.unit.dp
 import com.thebrownfoxx.components.VerticalSpacer
 
 @Composable
-fun EmptyScreen(modifier: Modifier = Modifier) {
+fun EmptyScreen(
+    modifier: Modifier = Modifier,
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,

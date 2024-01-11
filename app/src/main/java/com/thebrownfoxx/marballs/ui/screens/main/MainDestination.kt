@@ -55,6 +55,7 @@ fun Main(
         val selectedCache by selectedCache.collectAsStateWithLifecycle()
         val allowCacheEdit by allowCacheEdit.collectAsStateWithLifecycle()
         val selectedCacheFound by selectedCacheFound.collectAsStateWithLifecycle()
+        val deleteDialogVisible by deleteDialogVisible.collectAsStateWithLifecycle()
 
         val caches by caches.collectAsStateWithLifecycle()
         val cachesSearchQuery by cachesSearchQuery.collectAsStateWithLifecycle()
@@ -82,7 +83,9 @@ fun Main(
             when (currentScreen) {
                 MainScreen.Map -> MapScreen(
                     currentLocation = currentLocation,
+                    caches = caches,
                     selectedCache = selectedCache,
+                    onSelectCache = ::selectCache,
                     allowCacheEdit = allowCacheEdit,
                     selectedCacheFound = selectedCacheFound,
                     onMarkSelectedCacheAsFound = ::markSelectedCacheAsFound,
@@ -92,6 +95,10 @@ fun Main(
                     },
                     onResetLocation = ::resetLocation,
                     onAddCache = { navigator.navigate(AddCacheDestination) },
+                    deleteDialogVisible = deleteDialogVisible,
+                    onInitiateDeleteCache = ::initiateDeleteCache,
+                    onCancelDeleteCache = ::cancelDeleteCache,
+                    onDeleteCache = ::deleteCache,
                     modifier = Modifier.padding(contentPadding),
                 )
                 MainScreen.Caches -> CachesScreen(
