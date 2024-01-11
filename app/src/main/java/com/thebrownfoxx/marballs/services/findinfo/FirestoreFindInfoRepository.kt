@@ -7,35 +7,36 @@ import com.thebrownfoxx.marballs.domain.Outcome
 import com.thebrownfoxx.marballs.domain.User
 import com.thebrownfoxx.marballs.services.cacheinfo.CacheInfoProvider
 import com.thebrownfoxx.marballs.services.caches.CacheRepository
+import com.thebrownfoxx.marballs.services.finds.FindsRepository
 import com.thebrownfoxx.marballs.services.user.UserRepository
 import java.time.Instant
 import kotlin.random.Random
 
-class DummyFindInfoProvider(
+class FirestoreFindInfoRepository(
     private val cacheRepository: CacheRepository,
     private val cacheInfoProvider: CacheInfoProvider,
-    private val userRepository: UserRepository,
+    private val userRepository: UserRepository
 ): FindInfoProvider {
+
     override suspend fun Find.toFindInfo(): Outcome<FindInfo> {
         val cache = with(cacheInfoProvider) {
             cacheRepository.caches.value?.first { it.id == cacheId }
                 ?.toCacheInfo(Location(0.0, 0.0))!!
         }
 
-        return when (cache) {
-            is Outcome.Success -> {
-                Outcome.Success(
-                    FindInfo(
-                        id = id ?: Random.nextDouble().toString(),
-                        cache = cache.data,
-                        found = Instant.now(),
-                        finder = User("ufhe", "fiuehfi"),
-                    )
-                )
-            }
-            is Outcome.Failure -> {
-                Outcome.Failure(cache.throwable)
-            }
+        val findUserOutcome = userRepository.getUserById(finderId)
+        val finder = when (findUserOutcome) {
+            is Outcome.Success -> findUserOutcome.data
+            is Outcome.Failure -> null
+        }
+
+        return cache.map {
+            FindInfo(
+                id = id ?: Random.nextDouble().toString(),
+                cache = it,
+                found = Instant.ofEpochMilli(foundEpochMillis),
+                finder = finder ?: User(uid = "retger", email = "edgfr")
+            )
         }
     }
 }

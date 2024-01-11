@@ -4,6 +4,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 import com.thebrownfoxx.marballs.domain.Outcome
 import com.thebrownfoxx.marballs.domain.User
+import com.thebrownfoxx.marballs.services.awaitOutcome
 import com.thebrownfoxx.marballs.services.awaitUnitOutcome
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,12 +33,25 @@ class FireBaseUserRepository(private val firestore: FirebaseFirestore) : UserRep
                 }
             }
     }
+
+    override suspend fun getUserById(userId: String): Outcome<User> = withContext(Dispatchers.IO) {
+        return@withContext firestore.collection("users")
+            .document(userId)
+            .get()
+            .awaitOutcome()
+            .map { result ->
+                User(
+                    uid = result.id,
+                    email = result.getString("Email") ?: ""
+                )
+            }
+    }
     override suspend fun addUser(user: User): Outcome<Unit> = withContext(Dispatchers.IO) {
         val userMap = mapOf(
             "uid" to user.uid,
-            "email" to user.username
+            "email" to user.email
         )
-        return@withContext firestore.collection("caches")
+        return@withContext firestore.collection("users")
             .add(userMap)
             .awaitUnitOutcome()
             .also { updateUsers() }
