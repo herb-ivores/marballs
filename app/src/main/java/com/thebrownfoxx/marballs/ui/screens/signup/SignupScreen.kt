@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.twotone.ArrowBack
+import androidx.compose.material.icons.automirrored.twotone.ArrowBack
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -57,13 +59,14 @@ fun SignupScreen(
         Column(
             verticalArrangement = Arrangement.Center,
             modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(16.dp)
-                .padding(contentPadding)
-                .fillMaxSize(),
+                .padding(contentPadding),
         ) {
-            Row {
+            Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
                 IconButton(
-                    imageVector = Icons.TwoTone.ArrowBack,
+                    imageVector = Icons.AutoMirrored.TwoTone.ArrowBack,
                     contentDescription = "Back button",
                     onClick = onNavigateUp,
                 )

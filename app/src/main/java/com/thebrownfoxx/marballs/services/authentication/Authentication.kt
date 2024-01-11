@@ -9,5 +9,6 @@ interface Authentication {
     val loggedIn: StateFlow<Boolean>
     suspend fun signup(email: String, password: String): Outcome<Unit>
     suspend fun login(email: String, password: String): Outcome<Unit>
+    suspend fun changePassword(oldPassword: String, newPassword: String): Outcome<Unit>
     fun logout()
 }

@@ -1,5 +1,6 @@
 package com.thebrownfoxx.marballs.services.authentication
 
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.thebrownfoxx.extensions.mapToStateFlow
 import com.thebrownfoxx.marballs.domain.Outcome
@@ -53,6 +54,19 @@ class FirebaseAuthentication(
         return@withContext auth.signInWithEmailAndPassword(email, password)
             .awaitUnitOutcome()
             .also { updateCurrentUser() }
+    }
+
+    override suspend fun changePassword(
+        oldPassword: String,
+        newPassword: String,
+    ): Outcome<Unit> = withContext(Dispatchers.IO) {
+        val currentUser = auth.currentUser
+            ?: return@withContext Outcome.Failure(Exception("Not logged in"))
+        val credential = EmailAuthProvider.getCredential(currentUser.email ?: "", oldPassword)
+        if (currentUser.reauthenticate(credential).awaitUnitOutcome() is Outcome.Failure) {
+            return@withContext Outcome.Failure(Exception("Could not authenticate user"))
+        }
+        currentUser.updatePassword(newPassword).awaitUnitOutcome()
     }
 
     override fun logout() {

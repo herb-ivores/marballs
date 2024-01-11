@@ -21,6 +21,7 @@ import com.thebrownfoxx.marballs.domain.User
 import com.thebrownfoxx.marballs.ui.extensions.SnackbarHost
 import com.thebrownfoxx.marballs.ui.extensions.rememberSnackbarHostState
 import com.thebrownfoxx.marballs.ui.screens.destinations.AddCacheDestination
+import com.thebrownfoxx.marballs.ui.screens.destinations.ChangePasswordDestination
 import com.thebrownfoxx.marballs.ui.screens.destinations.EditCacheDestination
 import com.thebrownfoxx.marballs.ui.screens.main.caches.CachesScreen
 import com.thebrownfoxx.marballs.ui.screens.main.map.MapScreen
@@ -124,6 +125,7 @@ fun Main(
                     onFindSelect = ::selectFind,
                     onUnmarkFindAsFound = ::unmarkFindAsFound,
                     onReload = ::reload,
+                    onChangePassword = { navigator.navigate(ChangePasswordDestination) },
                     onLogout = ::logout,
                     modifier = Modifier.padding(contentPadding),
                 )

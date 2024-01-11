@@ -6,24 +6,32 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.thebrownfoxx.components.FilledButton
 import com.thebrownfoxx.components.TextButton
 import com.thebrownfoxx.components.VerticalSpacer
+import com.thebrownfoxx.marballs.R
 import com.thebrownfoxx.marballs.ui.extensions.SnackbarHost
 import com.thebrownfoxx.marballs.ui.extensions.rememberSnackbarHostState
 import com.thebrownfoxx.marballs.ui.theme.AppTheme
@@ -51,16 +59,29 @@ fun LoginScreen(
     ) { contentPadding ->
         Column(
             verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(16.dp)
-                .padding(contentPadding)
-                .fillMaxSize(),
+                .padding(contentPadding),
         ) {
+            Icon(
+                painter = painterResource(R.drawable.logo),
+                contentDescription = null,
+                modifier = Modifier.size(48.dp)
+            )
+            VerticalSpacer(height = 8.dp)
             Text(
-                text = "Login",
-                style = typography.headlineLarge,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth(),
+                text = buildAnnotatedString {
+                    withStyle(style = SpanStyle(fontWeight = FontWeight.Normal)) {
+                        append("Mar")
+                    }
+                    withStyle(style = SpanStyle(fontWeight = FontWeight.Black)) {
+                        append("balls")
+                    }
+                },
+                style = typography.headlineMedium,
             )
             VerticalSpacer(height = 32.dp)
             TextField(

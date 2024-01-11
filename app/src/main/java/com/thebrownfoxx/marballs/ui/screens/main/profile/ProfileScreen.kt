@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.twotone.Logout
+import androidx.compose.material.icons.twotone.Password
 import androidx.compose.material.icons.twotone.Person
 import androidx.compose.material.icons.twotone.Refresh
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -51,6 +52,7 @@ fun ProfileScreen(
     onFindSelect: (FindInfo) -> Unit,
     onUnmarkFindAsFound: (FindInfo) -> Unit,
     onReload: () -> Unit,
+    onChangePassword: () -> Unit,
     onLogout: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -76,6 +78,11 @@ fun ProfileScreen(
                     )
                 },
                 actions = {
+                    IconButton(
+                        imageVector = Icons.TwoTone.Password,
+                        contentDescription = null,
+                        onClick = onChangePassword,
+                    )
                     IconButton(
                         imageVector = Icons.AutoMirrored.TwoTone.Logout,
                         contentDescription = null,
@@ -180,6 +187,7 @@ fun ProfileScreenPreview() {
             onFindSelect = {},
             onUnmarkFindAsFound = {},
             onReload = {},
+            onChangePassword = {},
             onLogout = {},
         )
     }

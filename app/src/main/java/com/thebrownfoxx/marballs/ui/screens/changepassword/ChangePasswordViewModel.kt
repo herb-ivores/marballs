@@ -1,4 +1,4 @@
-package com.thebrownfoxx.marballs.ui.screens.signup
+package com.thebrownfoxx.marballs.ui.screens.changepassword
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,17 +10,22 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class SignupViewModel(private val authentication: Authentication) : ViewModel() {
+class ChangePasswordViewModel(private val authentication: Authentication) : ViewModel() {
     val loggedIn = authentication.loggedIn
+
+    val currentUser = authentication.currentUser
+
+    private val _success = MutableSharedFlow<Unit>()
+    val success = _success.asSharedFlow()
 
     private val _errors = MutableSharedFlow<String>()
     val errors = _errors.asSharedFlow()
 
-    private val _email = MutableStateFlow("")
-    val email = _email.asStateFlow()
+    private val _oldPassword = MutableStateFlow("")
+    val oldPassword = _oldPassword.asStateFlow()
 
-    private val _password = MutableStateFlow("")
-    val password = _password.asStateFlow()
+    private val _newPassword = MutableStateFlow("")
+    val newPassword = _newPassword.asStateFlow()
 
     private val _repeatPassword = MutableStateFlow("")
     val repeatPassword = _repeatPassword.asStateFlow()
@@ -28,26 +33,26 @@ class SignupViewModel(private val authentication: Authentication) : ViewModel() 
     private val _loading = MutableStateFlow(false)
     val loading = _loading.asStateFlow()
 
-    fun setEmail(email: String) {
-        _email.value = email
+    fun setOldPassword(oldPassword: String) {
+        _oldPassword.value = oldPassword
     }
 
-    fun setPassword(password: String) {
-        _password.value = password
+    fun setNewPassword(password: String) {
+        _newPassword.value = password
     }
 
     fun setRepeatPassword(repeatPassword: String) {
         _repeatPassword.value = repeatPassword
     }
 
-    fun signUp() {
+    fun changePassword() {
         _loading.value = true
 
-        val email = email.value
-        val password = password.value
+        val oldPassword = oldPassword.value
+        val newPassword = newPassword.value
         val repeatPassword = repeatPassword.value
 
-        if (email.isBlank() || password.isBlank() || repeatPassword.isBlank()) {
+        if (oldPassword.isBlank() || newPassword.isBlank() || repeatPassword.isBlank()) {
             viewModelScope.launch {
                 _errors.emit("Please fill out all fields")
             }
@@ -55,7 +60,7 @@ class SignupViewModel(private val authentication: Authentication) : ViewModel() 
             return
         }
 
-        if (password != repeatPassword) {
+        if (newPassword != repeatPassword) {
             viewModelScope.launch {
                 _errors.emit("Passwords do not match")
             }
@@ -64,15 +69,12 @@ class SignupViewModel(private val authentication: Authentication) : ViewModel() 
         }
 
         viewModelScope.launch {
-            when (val signupOutcome = authentication.signup(email, password)) {
+            when (val outcome = authentication.changePassword(oldPassword, newPassword)) {
                 is Outcome.Success -> {
-                    val loginOutcome = authentication.login(email, password)
-                    if (loginOutcome is Outcome.Failure) {
-                        _errors.emit(loginOutcome.throwableMessage)
-                    }
+                    _success.emit(Unit)
                 }
                 is Outcome.Failure -> {
-                    _errors.emit(signupOutcome.throwableMessage)
+                    _errors.emit(outcome.throwableMessage)
                 }
             }
             _loading.value = false

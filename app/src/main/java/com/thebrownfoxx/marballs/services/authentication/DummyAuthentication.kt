@@ -34,6 +34,13 @@ class DummyAuthentication : Authentication {
         return Outcome.Success()
     }
 
+    override suspend fun changePassword(
+        oldPassword: String,
+        newPassword: String,
+    ): Outcome<Unit> {
+        return Outcome.Success()
+    }
+
     override fun logout() {
         _currentUser.value = null
     }
