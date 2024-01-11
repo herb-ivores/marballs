@@ -13,19 +13,15 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.thebrownfoxx.marballs.services.authentication.Authentication
-import com.thebrownfoxx.marballs.services.authentication.DummyAuthentication
 import com.thebrownfoxx.marballs.services.authentication.FirebaseAuthentication
 import com.thebrownfoxx.marballs.services.cacheinfo.CacheInfoProvider
-import com.thebrownfoxx.marballs.services.cacheinfo.DummyCacheInfoProvider
 import com.thebrownfoxx.marballs.services.cacheinfo.PlacesFirebaseCacheInfoService
 import com.thebrownfoxx.marballs.services.caches.CacheRepository
-import com.thebrownfoxx.marballs.services.caches.DummyCacheRepository
 import com.thebrownfoxx.marballs.services.caches.FirestoreCacheRepository
-import com.thebrownfoxx.marballs.services.findinfo.DummyFindInfoProvider
 import com.thebrownfoxx.marballs.services.findinfo.FindInfoProvider
-import com.thebrownfoxx.marballs.services.finds.DummyFindsRepository
+import com.thebrownfoxx.marballs.services.findinfo.FirestoreFindInfoRepository
 import com.thebrownfoxx.marballs.services.finds.FindsRepository
-import com.thebrownfoxx.marballs.services.location.DummyLocationProvider
+import com.thebrownfoxx.marballs.services.finds.FireStoreFindsRepository
 import com.thebrownfoxx.marballs.services.location.GoogleLocationProvider
 import com.thebrownfoxx.marballs.services.location.LocationProvider
 import com.thebrownfoxx.marballs.services.user.FireBaseUserRepository
@@ -76,11 +72,8 @@ class MarballsApplication: Application() {
         Places.initialize(applicationContext, BuildConfig.MAPS_API_KEY)
         placesClient = Places.createClient(applicationContext)
         _cacheInfoProvider = PlacesFirebaseCacheInfoService(placesClient, authentication, this, userRepository)
-        _findsRepository = DummyFindsRepository()
-        _findInfoProvider = DummyFindInfoProvider(
-            cacheRepository = cacheRepository,
-            cacheInfoProvider = cacheInfoProvider,
-        )
+        _findsRepository = FireStoreFindsRepository(firestore)
+        _findInfoProvider = FirestoreFindInfoRepository(cacheRepository, cacheInfoProvider, userRepository)
     }
 }
 
