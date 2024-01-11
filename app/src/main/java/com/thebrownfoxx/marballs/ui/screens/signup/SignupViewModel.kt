@@ -55,23 +55,19 @@ class SignupViewModel(private val authentication: Authentication) : ViewModel() 
             return
         }
 
-        authentication.signup(email, password) { signupResult ->
-            when (signupResult) {
-                is Outcome.Success ->
-                    authentication.login(email, password) { loginResult ->
-                        if (loginResult is Outcome.Failure) {
-                            viewModelScope.launch {
-                                _errors.emit(loginResult.throwableMessage)
-                            }
-                        }
-                        _loading.value = false
+        viewModelScope.launch {
+            when (val signupOutcome = authentication.signup(email, password)) {
+                is Outcome.Success -> {
+                    val loginOutcome = authentication.login(email, password)
+                    if (loginOutcome is Outcome.Failure) {
+                        _errors.emit(loginOutcome.throwableMessage)
                     }
-
-                is Outcome.Failure -> viewModelScope.launch {
-                    _errors.emit(signupResult.throwableMessage)
-                    _loading.value = false
+                }
+                is Outcome.Failure -> {
+                    _errors.emit(signupOutcome.throwableMessage)
                 }
             }
+            _loading.value = false
         }
     }
 }

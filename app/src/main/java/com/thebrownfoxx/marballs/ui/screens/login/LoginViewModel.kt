@@ -43,15 +43,15 @@ class LoginViewModel(private val authentication: Authentication) : ViewModel() {
                 _errors.emit("Please fill out all fields")
             }
             _loading.value = false
-        } else {
-            authentication.login(email, password) { loginResult ->
-                if (loginResult is Outcome.Failure) {
-                    viewModelScope.launch {
-                        _errors.emit(loginResult.throwableMessage)
-                    }
-                }
-                _loading.value = false
+            return
+        }
+
+        viewModelScope.launch {
+            val outcome = authentication.login(email, password)
+            if (outcome is Outcome.Failure) {
+                _errors.emit(outcome.throwableMessage)
             }
+            _loading.value = false
         }
     }
 }

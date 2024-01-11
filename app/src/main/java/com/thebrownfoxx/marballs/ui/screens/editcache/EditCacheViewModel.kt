@@ -3,11 +3,9 @@ package com.thebrownfoxx.marballs.ui.screens.editcache
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.thebrownfoxx.extensions.mapToStateFlow
 import com.thebrownfoxx.marballs.domain.Cache
 import com.thebrownfoxx.marballs.domain.Location
 import com.thebrownfoxx.marballs.domain.Outcome
-import com.thebrownfoxx.marballs.services.authentication.Authentication
 import com.thebrownfoxx.marballs.services.cacheinfo.CacheInfoProvider
 import com.thebrownfoxx.marballs.services.caches.CacheRepository
 import com.thebrownfoxx.marballs.services.location.LocationProvider
@@ -32,7 +30,10 @@ class EditCacheViewModel(
 
     init {
         viewModelScope.launch {
-            _cache.emit(cacheRepository.getCache(cacheId))
+            when (val outcome = cacheRepository.getCache(cacheId)) {
+                is Outcome.Success -> _cache.value = outcome.data
+                is Outcome.Failure -> TODO("Show an error snackbar")
+            }
         }
     }
 
@@ -41,9 +42,19 @@ class EditCacheViewModel(
 
     val location = locationProvider.currentLocation
 
-    val locationName = location.mapToStateFlow(scope = viewModelScope) {
-        with(cacheInfoProvider) {
-            (it ?: Location(0.0, 0.0)).getLocationName()
+    private val _locationName = MutableStateFlow("")
+    val locationName = _locationName.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            locationProvider.currentLocation.collect {
+                val outcome = with(cacheInfoProvider) {
+                    it?.getLocationName()
+                }
+                if (outcome is Outcome.Success && outcome.data != "") {
+                    _locationName.value = outcome.data
+                }
+            }
         }
     }
 
@@ -62,10 +73,13 @@ class EditCacheViewModel(
     }
 
     fun resetLocation() {
-        locationProvider.updateLocation()
+        viewModelScope.launch {
+            locationProvider.updateLocation()
+        }
     }
 
     fun update(location: Location) {
+        // TODO: Add loading indicator
         val cache = cache.value
         if (cache!!.name.isBlank() || cache.description.isBlank()) {
             viewModelScope.launch {
@@ -81,8 +95,9 @@ class EditCacheViewModel(
             description = cache.description,
             location = location
         )
-        cacheRepository.updateCache(newCache) { result ->
-            when (result) {
+
+        viewModelScope.launch {
+            when (val outcome = cacheRepository.updateCache(newCache)) {
                 is Outcome.Success -> {
                     viewModelScope.launch {
                         _successful.emit(Unit)
@@ -91,7 +106,7 @@ class EditCacheViewModel(
 
                 is Outcome.Failure -> {
                     viewModelScope.launch {
-                        _errors.emit(result.throwableMessage)
+                        _errors.emit(outcome.throwableMessage)
                     }
                 }
             }

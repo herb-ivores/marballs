@@ -2,47 +2,37 @@ package com.thebrownfoxx.marballs.services.cacheinfo
 
 import android.Manifest
 import android.app.Application
-import android.content.ContentValues.TAG
 import android.content.pm.PackageManager
-import android.location.Geocoder
 import android.util.Log
 import androidx.core.content.ContextCompat
-import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.FetchPlaceRequest
-import com.google.android.libraries.places.api.net.FetchPlaceResponse
-import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest
-import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.gson.GsonBuilder
 import com.google.maps.GeoApiContext
 import com.google.maps.GeocodingApi
-import com.google.maps.model.GeocodingResult
 import com.thebrownfoxx.marballs.BuildConfig
 import com.thebrownfoxx.marballs.domain.Cache
 import com.thebrownfoxx.marballs.domain.CacheInfo
-import com.thebrownfoxx.marballs.domain.Distance
 import com.thebrownfoxx.marballs.domain.Location
+import com.thebrownfoxx.marballs.domain.Outcome
 import com.thebrownfoxx.marballs.domain.User
 import com.thebrownfoxx.marballs.extensions.distanceTo
 import com.thebrownfoxx.marballs.services.authentication.Authentication
+import com.thebrownfoxx.marballs.services.awaitOutcome
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import kotlin.random.Random
 
-
-infix fun Boolean.AND(other: Boolean) = this && other
+infix fun Boolean.AND(other: Boolean) = this && other // LOL
 
 class PlacesFirebaseCacheInfoService(
     private val placesClient: PlacesClient,
     private val auth: Authentication,
     private val application: Application,
 ) : CacheInfoProvider {
-
-
-    override fun Cache.toCacheInfo(currentLocation: Location): CacheInfo {
+    /*    override fun Cache.toCacheInfo(currentLocation: Location): CacheInfo {
         var infoHolder = CacheInfo(
             id = Random.nextLong().toString(),
             name = "defaultName",
@@ -138,5 +128,89 @@ class PlacesFirebaseCacheInfoService(
 
     override fun Location.getLocationName(): String {
        return ""
+    }*/
+    private suspend fun getPlaceId(locationLatLng: LatLng): String {
+        return withContext(Dispatchers.IO) {
+            val context = GeoApiContext.Builder()
+                .apiKey(BuildConfig.MAPS_API_KEY)
+                .build()
+
+            try {
+                val results = GeocodingApi.geocode(context, locationLatLng.latitude.toString() + "," + locationLatLng.longitude.toString()).await()
+                if (results.isNotEmpty()) {
+                    val placeId = results[0].placeId
+                    val gson = GsonBuilder().setPrettyPrinting().create()
+                    Log.d("PlacesFirebaseCacheInfoService", "Geocoding results: ${gson.toJson(results)}")
+                    return@withContext placeId
+                } else {
+                    Log.d("PlacesFirebaseCacheInfoService", "No results found for the given coordinates.")
+                }
+            } catch (e: Exception) {
+                Log.e("PlacesFirebaseCacheInfoService", "Error fetching place details: ${e.message}")
+            } finally {
+                // Invoke .shutdown() after your application is done making requests
+                context.shutdown()
+            }
+
+            return@withContext ""
+        }
+    }
+
+
+
+    override suspend fun Cache.toCacheInfo(currentLocation: Location): Outcome<CacheInfo> {
+        if (
+            (ContextCompat.checkSelfPermission(
+                application,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED) AND
+            (ContextCompat.checkSelfPermission(
+                application,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED)
+        ) {
+            return Outcome.Failure(IllegalStateException("No location permissions"))
+        }
+
+        val latitude = location.latitude
+        val longitude = location.longitude
+
+        val latLng = LatLng(latitude, longitude)
+
+        Log.d("PlacesFirebaseCacheInfoService", "Latitude: $latitude, Longitude: $longitude")
+
+        val placeId = runBlocking {
+            getPlaceId(latLng)
+        }
+
+
+        val placeFields = listOf(Place.Field.ID, Place.Field.NAME)
+
+        Log.d(this::class.simpleName, "placeID: $placeId")
+        val request = FetchPlaceRequest.newInstance(placeId, placeFields)
+
+        return placesClient.fetchPlace(request).awaitOutcome().map {
+            val place = it.place
+            Log.i("PlacesFirebaseCacheInfoService", "Place found: ${place.name}")
+            val locationName = place.name.orEmpty()
+            Log.d("PlacesFirebaseCacheInfoService", "Current Location: $currentLocation, Location: $location")
+            val distance = currentLocation.distanceTo(location)
+            val author = User("defaultUid", "defaultDisplayName")
+            Log.i("PlacesFirebaseCacheInfoService", "CacheInfo: $locationName, $distance, $author")
+            CacheInfo(
+                id = id ?: "DefaultID",
+                name = name,
+                description = description,
+                coordinates = location,
+                location = locationName,
+                distance = distance,
+                author = auth.currentUser.value ?: author
+            )
+        }
+    }
+
+    override suspend fun Location.getLocationName(): Outcome<String> {
+        // TODO: Fix this
+        return Outcome.Success("")
     }
 }

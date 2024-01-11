@@ -6,6 +6,8 @@ import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.thebrownfoxx.marballs.domain.Location
+import com.thebrownfoxx.marballs.domain.Outcome
+import com.thebrownfoxx.marballs.services.awaitOutcome
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
@@ -16,7 +18,7 @@ class GoogleLocationProvider(
     private val _currentLocation = MutableStateFlow<Location?>(null)
     override val currentLocation = _currentLocation.asStateFlow()
 
-    override fun updateLocation() {
+    override suspend fun updateLocation(): Outcome<Unit> {
         if (
             ContextCompat.checkSelfPermission(
                 application,
@@ -27,13 +29,14 @@ class GoogleLocationProvider(
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            return
+            return Outcome.Failure(IllegalStateException("Location permissions not granted"))
         }
-        fusedLocationClient.lastLocation.addOnSuccessListener {
-            _currentLocation.value = Location(
-                latitude = it.latitude,
-                longitude = it.longitude,
-            )
-        }
+        return fusedLocationClient.lastLocation.awaitOutcome()
+            .also {
+                if (it is Outcome.Success) {
+                    _currentLocation.value = Location(it.data.latitude, it.data.longitude)
+                }
+            }
+            .map {  }
     }
 }

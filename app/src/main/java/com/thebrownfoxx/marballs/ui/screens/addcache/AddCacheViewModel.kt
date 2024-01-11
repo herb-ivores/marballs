@@ -2,7 +2,6 @@ package com.thebrownfoxx.marballs.ui.screens.addcache
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.thebrownfoxx.extensions.mapToStateFlow
 import com.thebrownfoxx.marballs.domain.Cache
 import com.thebrownfoxx.marballs.domain.Location
 import com.thebrownfoxx.marballs.domain.Outcome
@@ -38,9 +37,19 @@ class AddCacheViewModel(
 
     val location = locationProvider.currentLocation
 
-    val locationName = location.mapToStateFlow(scope = viewModelScope) {
-        with(cacheInfoProvider) {
-            (it ?: Location(0.0, 0.0)).getLocationName()
+    private val _locationName = MutableStateFlow("")
+    val locationName = _locationName.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            locationProvider.currentLocation.collect {
+                val outcome = with(cacheInfoProvider) {
+                    it?.getLocationName()
+                }
+                if (outcome is Outcome.Success && outcome.data != "") {
+                    _locationName.value = outcome.data
+                }
+            }
         }
     }
 
@@ -56,7 +65,9 @@ class AddCacheViewModel(
     }
 
     fun resetLocation() {
-        locationProvider.updateLocation()
+        viewModelScope.launch {
+            locationProvider.updateLocation()
+        }
     }
 
     fun add(location: Location) {
@@ -80,8 +91,8 @@ class AddCacheViewModel(
             authorUid = authentication.currentUser.value?.uid ?: "",
         )
 
-        cacheRepository.addCache(cache) { result ->
-            when (result) {
+        viewModelScope.launch {
+            when (val outcome = cacheRepository.addCache(cache)) {
                 is Outcome.Success -> {
                     viewModelScope.launch {
                         _successful.emit(Unit)
@@ -90,7 +101,7 @@ class AddCacheViewModel(
 
                 is Outcome.Failure -> {
                     viewModelScope.launch {
-                        _errors.emit(result.throwableMessage)
+                        _errors.emit(outcome.throwableMessage)
                     }
                 }
             }

@@ -6,6 +6,6 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface FindsRepository {
     val finds: StateFlow<List<Find>?>
-    fun addFind(find: Find, onOutcomeReceived: (Outcome<Unit>) -> Unit)
-    fun removeFind(cacheId: String, onOutcomeReceived: (Outcome<Unit>) -> Unit)
+    suspend fun addFind(find: Find): Outcome<Unit>
+    suspend fun removeFind(cacheId: String): Outcome<Unit>
 }

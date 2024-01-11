@@ -16,24 +16,22 @@ class DummyAuthentication : Authentication {
 
     override val loggedIn = currentUser.mapToStateFlow(scope = scope) { it != null }
 
-    override fun signup(
+    override suspend fun signup(
         email: String,
         password: String,
-        onOutcomeReceived: (Outcome<Unit>) -> Unit,
-    ) {
-        onOutcomeReceived(Outcome.Success())
+    ): Outcome<Unit> {
+        return Outcome.Success()
     }
 
-    override fun login(
+    override suspend fun login(
         email: String,
         password: String,
-        onOutcomeReceived: (Outcome<Unit>) -> Unit,
-    ) {
+    ): Outcome<Unit> {
         _currentUser.value = User(
             uid = "123",
             email = email,
         )
-        onOutcomeReceived(Outcome.Success())
+        return Outcome.Success()
     }
 
     override fun logout() {

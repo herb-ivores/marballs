@@ -4,7 +4,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.thebrownfoxx.extensions.mapToStateFlow
 import com.thebrownfoxx.marballs.domain.Outcome
 import com.thebrownfoxx.marballs.domain.User
-import com.thebrownfoxx.marballs.services.addOnOutcomeListener
+import com.thebrownfoxx.marballs.services.awaitUnitOutcome
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,15 +27,12 @@ class FirebaseAuthentication(private val auth: FirebaseAuth) : Authentication {
         }
     }
 
-    override fun signup(email: String, password: String, onOutcomeReceived: (Outcome<Unit>) -> Unit) {
-        auth.createUserWithEmailAndPassword(email, password).addOnOutcomeListener(onOutcomeReceived)
+    override suspend fun signup(email: String, password: String): Outcome<Unit> {
+        return auth.createUserWithEmailAndPassword(email, password).awaitUnitOutcome()
     }
 
-    override fun login(email: String, password: String, onOutcomeReceived: (Outcome<Unit>) -> Unit) {
-        auth.signInWithEmailAndPassword(email, password).addOnOutcomeListener {
-            onOutcomeReceived(it)
-            updateCurrentUser()
-        }
+    override suspend fun login(email: String, password: String): Outcome<Unit> {
+        return auth.signInWithEmailAndPassword(email, password).awaitUnitOutcome()
     }
 
     override fun logout() {

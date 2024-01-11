@@ -6,8 +6,8 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface CacheRepository {
     val caches: StateFlow<List<Cache>?>
-    suspend fun getCache(cacheId: String) : Cache?
-    fun addCache(cache: Cache, onOutcomeReceived: (Outcome<Unit>) -> Unit)
-    fun updateCache(cache: Cache, onOutcomeReceived: (Outcome<Unit>) -> Unit)
-    fun removeCache(cache: Cache, onOutcomeReceived: (Outcome<Unit>) -> Unit)
+    suspend fun getCache(cacheId: String): Outcome<Cache?>
+    suspend fun addCache(cache: Cache): Outcome<Unit>
+    suspend fun updateCache(cache: Cache): Outcome<Unit>
+    suspend fun removeCache(cache: Cache): Outcome<Unit>
 }

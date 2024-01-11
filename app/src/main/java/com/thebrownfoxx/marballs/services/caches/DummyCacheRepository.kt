@@ -12,39 +12,42 @@ import kotlin.random.Random
 class DummyCacheRepository: CacheRepository {
     private val _caches = MutableStateFlow(emptyList<Cache>())
     override val caches = _caches.asStateFlow()
+    override suspend fun getCache(cacheId: String): Outcome<Cache?> {
+        return Outcome.Success(
+            _caches.map { caches -> caches.find { it.id == cacheId } }.firstOrNull()
+        )
+    }
 
-    override fun addCache(cache: Cache, onOutcomeReceived: (Outcome<Unit>) -> Unit) {
+    override suspend fun addCache(cache: Cache): Outcome<Unit> {
         _caches.update { it + cache.copy(id = Random.nextDouble().toString()) }
-        onOutcomeReceived(Outcome.Success())
+        return Outcome.Success()
     }
 
-    override suspend fun getCache(cacheId: String): Cache? {
-       return _caches.map { it.find { it.id == cacheId } }.firstOrNull()
-    }
-
-    override fun updateCache(cache: Cache, onOutcomeReceived: (Outcome<Unit>) -> Unit) {
+    override suspend fun updateCache(cache: Cache): Outcome<Unit> {
+        var outcome: Outcome<Unit> = Outcome.Success()
         _caches.update { caches ->
             val oldCache = caches.firstOrNull { it.id == cache.id }
             if (oldCache != null) {
-                onOutcomeReceived(Outcome.Success())
                 caches - oldCache + cache
             } else {
-                onOutcomeReceived(Outcome.Failure(IllegalArgumentException("Cache not found")))
+                outcome = Outcome.Failure(IllegalArgumentException("Cache not found"))
                 caches
             }
         }
+        return outcome
     }
 
-    override fun removeCache(cache: Cache, onOutcomeReceived: (Outcome<Unit>) -> Unit) {
+    override suspend fun removeCache(cache: Cache): Outcome<Unit> {
+        var outcome: Outcome<Unit> = Outcome.Success()
         _caches.update { caches ->
             val oldCache = caches.firstOrNull { it.id == cache.id }
             if (oldCache != null) {
-                onOutcomeReceived(Outcome.Success())
                 caches - oldCache
             } else {
-                onOutcomeReceived(Outcome.Failure(IllegalArgumentException("Cache not found")))
+                outcome = Outcome.Failure(IllegalArgumentException("Cache not found"))
                 caches
             }
         }
+        return outcome
     }
 }

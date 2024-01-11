@@ -9,4 +9,11 @@ sealed class Outcome<T> {
     companion object {
         fun Success() = Success(Unit)
     }
+
+    fun <R> map(transform: (T) -> R): Outcome<R> {
+        return when (this) {
+            is Success -> Success(transform(data))
+            is Failure -> Failure(throwable)
+        }
+    }
 }

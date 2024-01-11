@@ -11,21 +11,21 @@ class DummyFindsRepository : FindsRepository {
     private val _finds = MutableStateFlow(emptyList<Find>())
     override val finds = _finds.asStateFlow()
 
-    override fun addFind(find: Find, onOutcomeReceived: (Outcome<Unit>) -> Unit) {
+    override suspend fun addFind(find: Find): Outcome<Unit> {
         _finds.update { it + find.copy(id = Random.nextDouble().toString()) }
-        onOutcomeReceived(Outcome.Success(Unit))
+        return Outcome.Success()
     }
 
-    override fun removeFind(cacheId: String, onOutcomeReceived: (Outcome<Unit>) -> Unit) {
+    override suspend fun removeFind(cacheId: String): Outcome<Unit> {
+        var outcome: Outcome<Unit> = Outcome.Success()
         val oldFind = _finds.value.firstOrNull { it.cacheId == cacheId }
         if (oldFind != null) {
             _finds.update { finds ->
-                onOutcomeReceived(Outcome.Success(Unit))
                 finds - oldFind
             }
-            onOutcomeReceived(Outcome.Success(Unit))
         } else {
-            onOutcomeReceived(Outcome.Failure(IllegalArgumentException("Find not found")))
+            outcome = Outcome.Failure(IllegalArgumentException("Cache ID not found"))
         }
+        return outcome
     }
 }
