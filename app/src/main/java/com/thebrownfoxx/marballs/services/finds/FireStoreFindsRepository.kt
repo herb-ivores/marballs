@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
-class FireStoreFindsRepository(private val firestore: FirebaseFirestore): FindsRepository {
+class FireStoreFindsRepository(private val firestore: FirebaseFirestore) : FindsRepository {
     val scope = CoroutineScope(Dispatchers.IO)
 
     private val _finds = MutableStateFlow(emptyList<Find>())
@@ -25,8 +25,8 @@ class FireStoreFindsRepository(private val firestore: FirebaseFirestore): FindsR
         }
     }
 
-    override  suspend fun updateFinds(){
-        withContext(Dispatchers.IO){
+    override suspend fun updateFinds() {
+        withContext(Dispatchers.IO) {
             firestore.collection("finds")
                 .get()
                 .addOnSuccessListener { results ->
@@ -35,7 +35,7 @@ class FireStoreFindsRepository(private val firestore: FirebaseFirestore): FindsR
                             id = it.id,
                             cacheId = it.getString("cacheId") ?: "",
                             finderId = it.getString("finderId") ?: "",
-                            foundEpochMillis =  it.getLong("found") ?: 0
+                            foundEpochMillis = it.getLong("found") ?: 0
                         )
                     }
                 }.await()
@@ -43,7 +43,7 @@ class FireStoreFindsRepository(private val firestore: FirebaseFirestore): FindsR
     }
 
     override suspend fun addFind(find: Find): Outcome<Unit> = withContext(Dispatchers.IO) {
-        val findMap =  mapOf(
+        val findMap = mapOf(
             "cacheId" to find.cacheId,
             "finderId" to find.finderId,
             "found" to find.foundEpochMillis,
@@ -55,10 +55,14 @@ class FireStoreFindsRepository(private val firestore: FirebaseFirestore): FindsR
     }
 
     override suspend fun removeFind(cacheId: String): Outcome<Unit> = withContext(Dispatchers.IO) {
-        return@withContext firestore.collection("finds").document(cacheId)
-            .delete()
+        val outcome = firestore.collection("finds").whereEqualTo("cacheId", cacheId)
+            .get()
             .awaitOutcome()
-            .map { }
-            .also { updateFinds() }
+        if (outcome is Outcome.Failure) {
+            return@withContext Outcome.Failure(outcome.throwable)
+        }
+        (outcome as Outcome.Success).data.first().reference.delete().awaitUnitOutcome()
+
     }
+
 }
