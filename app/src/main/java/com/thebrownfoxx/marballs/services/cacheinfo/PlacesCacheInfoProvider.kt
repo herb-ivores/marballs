@@ -158,7 +158,7 @@ class PlacesFirebaseCacheInfoService(
 
 
 
-    override suspend fun Cache.toCacheInfo(currentLocation: Location): Outcome<CacheInfo> {
+    override suspend fun Cache.toCacheInfo(currentLocation: Location): Outcome<CacheInfo> = withContext(Dispatchers.IO) {
         if (
             (ContextCompat.checkSelfPermission(
                 application,
@@ -169,7 +169,7 @@ class PlacesFirebaseCacheInfoService(
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED)
         ) {
-            return Outcome.Failure(IllegalStateException("No location permissions"))
+            return@withContext Outcome.Failure(IllegalStateException("No location permissions"))
         }
 
         val latitude = location.latitude
@@ -189,7 +189,7 @@ class PlacesFirebaseCacheInfoService(
         Log.d(this::class.simpleName, "placeID: $placeId")
         val request = FetchPlaceRequest.newInstance(placeId, placeFields)
 
-        return placesClient.fetchPlace(request).awaitOutcome().map {
+        return@withContext placesClient.fetchPlace(request).awaitOutcome().map {
             val place = it.place
             Log.i("PlacesFirebaseCacheInfoService", "Place found: ${place.name}")
             val locationName = place.name.orEmpty()
@@ -209,8 +209,8 @@ class PlacesFirebaseCacheInfoService(
         }
     }
 
-    override suspend fun Location.getLocationName(): Outcome<String> {
+    override suspend fun Location.getLocationName(): Outcome<String> = withContext(Dispatchers.IO) {
         // TODO: Fix this
-        return Outcome.Success("")
+        return@withContext Outcome.Success("")
     }
 }

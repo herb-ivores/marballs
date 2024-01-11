@@ -1,8 +1,7 @@
 package com.thebrownfoxx.marballs.services.user
 
-import android.os.OutcomeReceiver
-import com.google.firebase.firestore.auth.User
 import com.thebrownfoxx.marballs.domain.Outcome
+import com.thebrownfoxx.marballs.domain.User
 import kotlinx.coroutines.flow.StateFlow
 
 interface UserRepository {
