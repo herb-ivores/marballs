@@ -35,9 +35,9 @@ class FireBaseUserRepository(private val firestore: FirebaseFirestore) : UserRep
     override suspend fun addUser(user: User): Outcome<Unit> = withContext(Dispatchers.IO) {
         val userMap = mapOf(
             "uid" to user.uid,
-            "email" to user.username
+            "email" to user.email
         )
-        return@withContext firestore.collection("caches")
+        return@withContext firestore.collection("users")
             .add(userMap)
             .awaitUnitOutcome()
             .also { updateUsers() }
