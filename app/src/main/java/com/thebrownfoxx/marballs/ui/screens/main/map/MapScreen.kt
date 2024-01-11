@@ -34,7 +34,7 @@ import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.rememberMarkerState
+import com.google.maps.android.compose.MarkerState
 import com.thebrownfoxx.components.HorizontalSpacer
 import com.thebrownfoxx.components.VerticalSpacer
 import com.thebrownfoxx.components.extension.minus
@@ -147,7 +147,7 @@ fun MapScreen(
         ) {
             caches.forEach { cache ->
                 Marker(
-                    state = rememberMarkerState(position = cache.coordinates.toLatLng()),
+                    state = MarkerState(position = cache.coordinates.toLatLng()),
                     onClick = {
                         onSelectCache(cache)
                         true

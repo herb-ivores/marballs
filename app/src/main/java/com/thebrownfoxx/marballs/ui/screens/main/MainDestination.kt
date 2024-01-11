@@ -18,6 +18,8 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.thebrownfoxx.components.extension.Zero
 import com.thebrownfoxx.marballs.application
 import com.thebrownfoxx.marballs.domain.User
+import com.thebrownfoxx.marballs.ui.extensions.SnackbarHost
+import com.thebrownfoxx.marballs.ui.extensions.rememberSnackbarHostState
 import com.thebrownfoxx.marballs.ui.screens.destinations.AddCacheDestination
 import com.thebrownfoxx.marballs.ui.screens.destinations.EditCacheDestination
 import com.thebrownfoxx.marballs.ui.screens.main.caches.CachesScreen
@@ -73,6 +75,9 @@ fun Main(
 
         Scaffold(
             contentWindowInsets = WindowInsets.Zero,
+            snackbarHost = {
+                SnackbarHost(state = rememberSnackbarHostState(messages = errors))
+            },
             bottomBar = {
                 BottomBar(
                     currentScreen = currentScreen,
@@ -101,6 +106,7 @@ fun Main(
                     onDeleteCache = ::deleteCache,
                     modifier = Modifier.padding(contentPadding),
                 )
+
                 MainScreen.Caches -> CachesScreen(
                     caches = caches,
                     searchQuery = cachesSearchQuery,
@@ -109,6 +115,7 @@ fun Main(
                     onReload = ::reload,
                     modifier = Modifier.padding(contentPadding),
                 )
+
                 MainScreen.Profile -> ProfileScreen(
                     currentUser = currentUser ?: User("", ""),
                     finds = finds,
