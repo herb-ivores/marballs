@@ -28,6 +28,7 @@ fun AddCache(
         val description by description.collectAsStateWithLifecycle()
         val location by location.collectAsStateWithLifecycle()
         val locationName by locationName.collectAsStateWithLifecycle()
+        val loading by loading.collectAsStateWithLifecycle()
 
         val loggedIn by loggedIn.collectAsStateWithLifecycle()
 
@@ -54,6 +55,7 @@ fun AddCache(
             onAdd = ::add,
             errors = errors,
             navigateUp = navigator::navigateUp,
+            loading = loading,
         )
     }
 }

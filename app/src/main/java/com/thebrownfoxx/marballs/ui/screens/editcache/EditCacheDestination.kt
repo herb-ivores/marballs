@@ -26,6 +26,7 @@ fun EditCache(
     with(viewModel){
         val cache by cache.collectAsStateWithLifecycle()
         val locationName by locationName.collectAsStateWithLifecycle()
+        val loading by loading.collectAsStateWithLifecycle()
 
         LaunchedEffect(successful) {
             successful.collect {
@@ -42,7 +43,8 @@ fun EditCache(
                 onResetLocation = ::resetLocation,
                 onUpdate = ::update,
                 errors = errors,
-                navigateUp = navigator::navigateUp
+                navigateUp = navigator::navigateUp,
+                loading = loading,
             )
         }
     }
