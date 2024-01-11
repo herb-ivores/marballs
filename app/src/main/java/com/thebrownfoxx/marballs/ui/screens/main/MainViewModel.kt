@@ -7,7 +7,6 @@ import com.thebrownfoxx.extensions.search
 import com.thebrownfoxx.marballs.domain.CacheInfo
 import com.thebrownfoxx.marballs.domain.Find
 import com.thebrownfoxx.marballs.domain.FindInfo
-import com.thebrownfoxx.marballs.domain.Loadable
 import com.thebrownfoxx.marballs.domain.Location
 import com.thebrownfoxx.marballs.domain.Outcome
 import com.thebrownfoxx.marballs.services.authentication.Authentication
@@ -36,6 +35,8 @@ class MainViewModel(
     val loggedIn = authentication.loggedIn
 
     val currentUser = authentication.currentUser
+
+    private val reload = MutableSharedFlow<Unit>()
 
     private val _currentScreen = MutableStateFlow(MainScreen.Map)
     val currentScreen = _currentScreen.asStateFlow()
@@ -127,10 +128,11 @@ class MainViewModel(
     val cachesSearchQuery = _cachesSearchQuery.asStateFlow()
 
     val caches = combine(
+        reload,
         cachesSearchQuery,
         cacheRepository.caches,
         locationProvider.currentLocation,
-    ) { searchQuery, caches, currentLocation ->
+    ) { _, searchQuery, caches, currentLocation ->
         val outcomes = with(cacheInfoProvider) {
             caches?.map { cache ->
                 cache.toCacheInfo(
@@ -139,15 +141,13 @@ class MainViewModel(
             }
         }
         if (outcomes == null || outcomes.any { it is Outcome.Failure }) {
-            Loadable.Failure<List<CacheInfo>>(IllegalStateException("Failed to load"))
+            emptyList()
         } else {
-            Loadable.Success(
-                outcomes.filterIsInstance<Outcome.Success<CacheInfo>>()
-                    .map { it.data }
-                    .search(searchQuery) { it.name }
-            )
+            outcomes.filterIsInstance<Outcome.Success<CacheInfo>>()
+                .map { it.data }
+                .search(searchQuery) { it.name }
         }
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, Loadable.Loading<List<CacheInfo>>())
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     fun setCachesSearchQuery(query: String) {
         _cachesSearchQuery.value = query
@@ -166,25 +166,23 @@ class MainViewModel(
     val findsSearchQuery = _findsSearchQuery.asStateFlow()
 
     val finds = combine(
+        reload,
         findsSearchQuery,
         findsRepository.finds,
-        cacheRepository.caches,
-    ) { searchQuery, finds, caches ->
+    ) { _, searchQuery, finds ->
         val outcomes = with(findInfoProvider) {
             finds?.map { find ->
                 find.toFindInfo()
             }
         }
         if (outcomes == null || outcomes.any { it is Outcome.Failure }) {
-            Loadable.Failure<List<FindInfo>>(IllegalStateException("Failed to load"))
+            emptyList()
         } else {
-            Loadable.Success(
-                outcomes.filterIsInstance<Outcome.Success<FindInfo>>()
-                    .map { it.data }
-                    .search(searchQuery) { it.cache.name }
-            )
+            outcomes.filterIsInstance<Outcome.Success<FindInfo>>()
+                .map { it.data }
+                .search(searchQuery) { it.cache.name }
         }
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, Loadable.Loading<List<FindInfo>>())
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     fun setFindsSearchQuery(query: String) {
         _findsSearchQuery.value = query
@@ -208,5 +206,13 @@ class MainViewModel(
 
     fun logout() {
         authentication.logout()
+    }
+
+    fun reload() {
+        viewModelScope.launch {
+            cacheRepository.updateCaches()
+            findsRepository.updateFinds()
+            reload.emit(Unit)
+        }
     }
 }

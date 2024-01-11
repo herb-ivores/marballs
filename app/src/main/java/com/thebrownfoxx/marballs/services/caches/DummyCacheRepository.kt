@@ -12,6 +12,8 @@ import kotlin.random.Random
 class DummyCacheRepository: CacheRepository {
     private val _caches = MutableStateFlow(emptyList<Cache>())
     override val caches = _caches.asStateFlow()
+    override suspend fun updateCaches() {}
+
     override suspend fun getCache(cacheId: String): Outcome<Cache?> {
         return Outcome.Success(
             _caches.map { caches -> caches.find { it.id == cacheId } }.firstOrNull()

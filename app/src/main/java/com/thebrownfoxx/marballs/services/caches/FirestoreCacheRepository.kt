@@ -6,20 +6,27 @@ import com.thebrownfoxx.marballs.domain.Location
 import com.thebrownfoxx.marballs.domain.Outcome
 import com.thebrownfoxx.marballs.services.awaitOutcome
 import com.thebrownfoxx.marballs.services.awaitUnitOutcome
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 
 class FirestoreCacheRepository(private val firestore: FirebaseFirestore) : CacheRepository {
+    val scope = CoroutineScope(Dispatchers.IO)
 
     private val _caches = MutableStateFlow<List<Cache>?>(null)
     override val caches = _caches.asStateFlow()
 
     init {
-        updateCaches()
+        scope.launch {
+            updateCaches()
+        }
     }
 
-    fun updateCaches() {
+    override suspend fun updateCaches() {
         firestore.collection("caches")
             .get()
             .addOnSuccessListener { results ->
@@ -37,6 +44,7 @@ class FirestoreCacheRepository(private val firestore: FirebaseFirestore) : Cache
                     )
                 }
             }
+            .await()
     }
 
     override suspend fun getCache(cacheId: String): Outcome<Cache?> {

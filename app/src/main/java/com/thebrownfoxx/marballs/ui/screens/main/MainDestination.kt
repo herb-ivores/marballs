@@ -99,7 +99,7 @@ fun Main(
                     searchQuery = cachesSearchQuery,
                     onSearchQueryChange = ::setCachesSearchQuery,
                     onCacheSelect = ::selectCache,
-                    onReload = {},
+                    onReload = ::reload,
                     modifier = Modifier.padding(contentPadding),
                 )
                 MainScreen.Profile -> ProfileScreen(
@@ -109,7 +109,7 @@ fun Main(
                     onSearchQueryChange = ::setFindsSearchQuery,
                     onFindSelect = ::selectFind,
                     onUnmarkFindAsFound = ::unmarkFindAsFound,
-                    onReload = {},
+                    onReload = ::reload,
                     onLogout = ::logout,
                     modifier = Modifier.padding(contentPadding),
                 )

@@ -10,6 +10,7 @@ import kotlin.random.Random
 class DummyFindsRepository : FindsRepository {
     private val _finds = MutableStateFlow(emptyList<Find>())
     override val finds = _finds.asStateFlow()
+    override suspend fun updateFinds() {}
 
     override suspend fun addFind(find: Find): Outcome<Unit> {
         _finds.update { it + find.copy(id = Random.nextDouble().toString()) }
