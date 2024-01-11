@@ -79,7 +79,8 @@ class EditCacheViewModel(
     }
 
     fun update(location: Location) {
-        // TODO: Add loading indicator
+        _loading.value = true
+
         val cache = cache.value
         if (cache!!.name.isBlank() || cache.description.isBlank()) {
             viewModelScope.launch {
@@ -110,6 +111,7 @@ class EditCacheViewModel(
                     }
                 }
             }
+            _loading.value = false
         }
     }
 }

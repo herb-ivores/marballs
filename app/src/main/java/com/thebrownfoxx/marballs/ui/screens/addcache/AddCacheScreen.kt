@@ -1,5 +1,6 @@
 package com.thebrownfoxx.marballs.ui.screens.addcache
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +15,7 @@ import androidx.compose.material.icons.twotone.MyLocation
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallFloatingActionButton
@@ -30,6 +32,7 @@ import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.thebrownfoxx.components.FilledButton
 import com.thebrownfoxx.components.IconButton
+import com.thebrownfoxx.components.VerticalSpacer
 import com.thebrownfoxx.components.extension.minus
 import com.thebrownfoxx.marballs.domain.Location
 import com.thebrownfoxx.marballs.extensions.toLatLng
@@ -55,6 +58,7 @@ fun AddCacheScreen(
     errors: Flow<String>,
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
+    loading: Boolean,
 ) {
     val cameraPositionState = remember(location.key.toString()) {
         CameraPositionState(
@@ -103,14 +107,24 @@ fun AddCacheScreen(
                 onDescriptionChange = onDescriptionChange,
                 location = locationName,
                 saveButton = {
+                    AnimatedVisibility(visible = loading) {
+                        LinearProgressIndicator(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 24.dp),
+                        )
+                    }
+                    VerticalSpacer(height = 16.dp)
                     FilledButton(
                         icon = Icons.TwoTone.Add,
                         text = "Add",
+                        enabled = !loading,
                         onClick = {
                             onAdd(cameraPositionState.position.target.toLocation())
                         },
                         modifier = Modifier.fillMaxWidth(),
                     )
+
                 },
                 modifier = Modifier
                     .padding(PaddingValues(16.dp) - PaddingValues(top = 16.dp)),
@@ -147,6 +161,7 @@ fun AddCacheScreenPreview() {
             onAdd = {},
             errors = emptyFlow(),
             navigateUp = {},
+            loading = true
         )
     }
 }
