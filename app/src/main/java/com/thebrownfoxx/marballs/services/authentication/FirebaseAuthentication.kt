@@ -9,6 +9,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.withContext
 
 class FirebaseAuthentication(private val auth: FirebaseAuth) : Authentication {
     private val scope = CoroutineScope(Dispatchers.Main)
@@ -27,12 +28,12 @@ class FirebaseAuthentication(private val auth: FirebaseAuth) : Authentication {
         }
     }
 
-    override suspend fun signup(email: String, password: String): Outcome<Unit> {
-        return auth.createUserWithEmailAndPassword(email, password).awaitUnitOutcome()
+    override suspend fun signup(email: String, password: String): Outcome<Unit> = withContext(Dispatchers.IO) {
+        return@withContext auth.createUserWithEmailAndPassword(email, password).awaitUnitOutcome()
     }
 
-    override suspend fun login(email: String, password: String): Outcome<Unit> {
-        return auth.signInWithEmailAndPassword(email, password).awaitUnitOutcome()
+    override suspend fun login(email: String, password: String): Outcome<Unit> = withContext(Dispatchers.IO) {
+        return@withContext auth.signInWithEmailAndPassword(email, password).awaitUnitOutcome()
     }
 
     override fun logout() {
