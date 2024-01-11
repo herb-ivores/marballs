@@ -62,7 +62,7 @@ class FireStoreFindsRepository(private val firestore: FirebaseFirestore) : Finds
             return@withContext Outcome.Failure(outcome.throwable)
         }
         (outcome as Outcome.Success).data.first().reference.delete().awaitUnitOutcome()
-
+            .also { updateFinds() }
     }
 
 }
