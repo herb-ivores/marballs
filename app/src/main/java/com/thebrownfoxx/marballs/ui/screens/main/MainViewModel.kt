@@ -57,8 +57,22 @@ class MainViewModel(
         resetLocation()
     }
 
-    private val _selectedCache = MutableStateFlow<CacheInfo?>(null)
-    val selectedCache = _selectedCache.asStateFlow()
+    private val selectedCacheId = MutableStateFlow<String?>(null)
+    val selectedCache = combine(
+        selectedCacheId,
+        cacheRepository.caches,
+    ) { selectedCacheId, caches ->
+        with(cacheInfoProvider) {
+            val outcome = caches?.find { it.id == selectedCacheId }?.toCacheInfo(
+                locationProvider.currentLocation.value ?: Location(0.0, 0.0)
+            )
+            if (outcome is Outcome.Success) {
+                outcome.data
+            } else {
+                null
+            }
+        }
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     val allowCacheEdit = combineToStateFlow(
         authentication.currentUser,
@@ -133,7 +147,7 @@ class MainViewModel(
                     _errors.emit(outcome.throwableMessage)
                 }
                 _deleteDialogVisible.value = false
-                _selectedCache.value = null
+                selectedCacheId.value = null
             }
         }
     }
@@ -177,7 +191,7 @@ class MainViewModel(
 
     fun selectCache(cache: CacheInfo) {
         _currentScreen.value = MainScreen.Map
-        _selectedCache.value = cache
+        selectedCacheId.value = cache.id
         _location.value = cache.coordinates
     }
 
@@ -208,7 +222,7 @@ class MainViewModel(
 
     fun selectFind(find: FindInfo) {
         _currentScreen.value = MainScreen.Map
-        _selectedCache.value = find.cache
+        selectedCacheId.value = find.cache.id
     }
 
     fun unmarkFindAsFound(find: FindInfo) {

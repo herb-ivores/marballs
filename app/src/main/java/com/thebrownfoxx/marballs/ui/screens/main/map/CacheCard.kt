@@ -19,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -26,6 +27,7 @@ import com.thebrownfoxx.components.FilledButton
 import com.thebrownfoxx.components.FilledTonalButton
 import com.thebrownfoxx.components.FilledTonalIconButton
 import com.thebrownfoxx.components.VerticalSpacer
+import com.thebrownfoxx.marballs.MainActivity
 import com.thebrownfoxx.marballs.domain.CacheInfo
 import com.thebrownfoxx.marballs.domain.Location
 import com.thebrownfoxx.marballs.domain.User
@@ -44,6 +46,8 @@ fun CacheCard(
     onUnmarkAsFound: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val mainActivity = LocalContext.current as? MainActivity
+
     Card(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.9f),
@@ -100,7 +104,9 @@ fun CacheCard(
                 FilledTonalIconButton(
                     imageVector = Icons.TwoTone.Navigation,
                     contentDescription = null,
-                    onClick = { /*TODO*/ },
+                    onClick = {
+                        mainActivity?.openMap(cache)
+                    },
                 )
                 if (!found) {
                     FilledButton(
@@ -137,7 +143,7 @@ fun CacheCardPreview() {
                 location = "Area 69",
                 distance = 69.0.meters,
                 author = User(uid = "1", email = "jonelespiritu@fuckers-online.io"),
-                coordinates = Location(19.2132,121.3242)
+                coordinates = Location(19.2132, 121.3242)
             ),
             allowEdit = true,
             found = false,
@@ -162,7 +168,7 @@ fun CacheCardLongTextsPreview() {
                 description = "These are model dolls hidden in a chest. Please stop cumming on them. It's very difficult having to go back and clean all the sticky gunk you all left on my poor dolls.",
                 distance = 69.0.meters,
                 author = User(uid = "1", email = "jonelespiritu@fuckers-online.io"),
-                coordinates = Location(19.2132,121.3242)
+                coordinates = Location(19.2132, 121.3242)
             ),
             allowEdit = true,
             found = false,
