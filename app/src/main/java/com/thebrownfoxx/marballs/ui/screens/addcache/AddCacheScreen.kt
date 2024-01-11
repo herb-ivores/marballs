@@ -32,7 +32,6 @@ import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.thebrownfoxx.components.FilledButton
 import com.thebrownfoxx.components.IconButton
-import com.thebrownfoxx.components.VerticalSpacer
 import com.thebrownfoxx.components.extension.minus
 import com.thebrownfoxx.marballs.domain.Location
 import com.thebrownfoxx.marballs.extensions.toLatLng
@@ -110,10 +109,10 @@ fun AddCacheScreen(
                         LinearProgressIndicator(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(top = 24.dp),
+                                .padding(top = 24.dp, bottom = 16.dp)
+                                .padding(horizontal = 8.dp),
                         )
                     }
-                    VerticalSpacer(height = 16.dp)
                     FilledButton(
                         icon = Icons.TwoTone.Add,
                         text = "Add",

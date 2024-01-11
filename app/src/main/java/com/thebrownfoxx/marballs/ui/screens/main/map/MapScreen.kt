@@ -65,6 +65,7 @@ fun MapScreen(
     onInitiateDeleteCache: () -> Unit,
     onCancelDeleteCache: () -> Unit,
     onDeleteCache: () -> Unit,
+    loading: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val cameraPositionState = remember(location?.key.toString()) {
@@ -134,6 +135,7 @@ fun MapScreen(
                     onUnmarkAsFound = onUnmarkSelectedCacheAsFound,
                     onEdit = onEditCache,
                     onDelete = onInitiateDeleteCache,
+                    loading = loading,
                     modifier = Modifier
                         .padding(PaddingValues(16.dp) - PaddingValues(top = 16.dp)),
                 )
@@ -188,6 +190,7 @@ fun MapScreenPreview() {
             onInitiateDeleteCache = {},
             onCancelDeleteCache = {},
             onDeleteCache = {},
+            loading = true,
         )
     }
 }
@@ -220,6 +223,7 @@ fun MapScreenWithCachePreview() {
             onInitiateDeleteCache = {},
             onCancelDeleteCache = {},
             onDeleteCache = {},
+            loading = true,
         )
     }
 }

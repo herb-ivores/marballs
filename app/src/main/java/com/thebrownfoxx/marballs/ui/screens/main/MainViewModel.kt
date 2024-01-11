@@ -36,6 +36,9 @@ class MainViewModel(
     private val _errors = MutableSharedFlow<String>()
     val errors = _errors.asSharedFlow()
 
+    private val _loading = MutableStateFlow(false)
+    val loading = _loading.asStateFlow()
+
     val loggedIn = authentication.loggedIn
 
     val currentUser = authentication.currentUser
@@ -99,6 +102,7 @@ class MainViewModel(
         val currentUser = authentication.currentUser.value
         if (selectedCache != null && currentUser != null) {
             viewModelScope.launch {
+                _loading.value = true
                 val outcome = findsRepository.addFind(
                     Find(
                         cacheId = selectedCache.id,
@@ -107,10 +111,9 @@ class MainViewModel(
                     )
                 )
                 if (outcome is Outcome.Failure) {
-                    viewModelScope.launch {
-                        _errors.emit(outcome.throwableMessage)
-                    }
+                    _errors.emit(outcome.throwableMessage)
                 }
+                _loading.value = false
             }
         }
     }
@@ -120,10 +123,12 @@ class MainViewModel(
         val currentUser = authentication.currentUser.value
         if (selectedCache != null && currentUser != null) {
             viewModelScope.launch {
+                _loading.value = true
                 val outcome = findsRepository.removeFind(selectedCache.id)
                 if (outcome is Outcome.Failure) {
                     _errors.emit(outcome.throwableMessage)
                 }
+                _loading.value = false
             }
         }
     }
@@ -142,12 +147,14 @@ class MainViewModel(
         val selectedCache = selectedCache.value
         if (selectedCache != null) {
             viewModelScope.launch {
+                _loading.value = true
                 val outcome = cacheRepository.removeCache(selectedCache.id)
                 if (outcome is Outcome.Failure) {
                     _errors.emit(outcome.throwableMessage)
                 }
                 _deleteDialogVisible.value = false
                 selectedCacheId.value = null
+                _loading.value = false
             }
         }
     }
@@ -195,6 +202,9 @@ class MainViewModel(
         _location.value = cache.coordinates
     }
 
+    private val _disabledFind = MutableStateFlow<FindInfo?>(null)
+    val disabledFind = _disabledFind.asStateFlow()
+
     private val _findsSearchQuery = MutableStateFlow("")
     val findsSearchQuery = _findsSearchQuery.asStateFlow()
 
@@ -227,12 +237,14 @@ class MainViewModel(
 
     fun unmarkFindAsFound(find: FindInfo) {
         viewModelScope.launch {
+            _disabledFind.value = find
             val outcome = findsRepository.removeFind(find.cache.id)
             if (outcome is Outcome.Failure) {
                 viewModelScope.launch {
                     _errors.emit(outcome.throwableMessage)
                 }
             }
+            _disabledFind.value = null
         }
     }
 

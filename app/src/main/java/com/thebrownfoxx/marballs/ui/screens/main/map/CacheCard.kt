@@ -15,6 +15,7 @@ import androidx.compose.material.icons.twotone.Straighten
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,6 +45,7 @@ fun CacheCard(
     onDelete: () -> Unit,
     onMarkAsFound: () -> Unit,
     onUnmarkAsFound: () -> Unit,
+    loading: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val mainActivity = LocalContext.current as? MainActivity
@@ -83,6 +85,14 @@ fun CacheCard(
                     value = "${cache.distance}",
                 )
             }
+            androidx.compose.animation.AnimatedVisibility(visible = loading) {
+                LinearProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 24.dp)
+                        .padding(horizontal = 8.dp),
+                )
+            }
             VerticalSpacer(height = 16.dp)
             Row {
                 if (allowEdit) {
@@ -114,6 +124,7 @@ fun CacheCard(
                         iconContentDescription = null,
                         text = "Found",
                         onClick = onMarkAsFound,
+                        enabled = !loading,
                         modifier = Modifier.fillMaxWidth(),
                     )
                 } else {
@@ -123,6 +134,7 @@ fun CacheCard(
                         text = "Not found",
                         onClick = onUnmarkAsFound,
                         modifier = Modifier.fillMaxWidth(),
+                        enabled = !loading,
                     )
                 }
             }
@@ -151,6 +163,7 @@ fun CacheCardPreview() {
             onDelete = {},
             onMarkAsFound = {},
             onUnmarkAsFound = {},
+            loading = true,
             modifier = Modifier.padding(16.dp)
         )
     }
@@ -176,6 +189,7 @@ fun CacheCardLongTextsPreview() {
             onDelete = {},
             onMarkAsFound = {},
             onUnmarkAsFound = {},
+            loading = true,
             modifier = Modifier.padding(16.dp),
         )
     }

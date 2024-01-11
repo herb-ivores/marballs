@@ -68,6 +68,10 @@ fun Main(
 
         val loggedIn by loggedIn.collectAsStateWithLifecycle()
 
+        val loading by loading.collectAsStateWithLifecycle()
+
+        val disabledFind by disabledFind.collectAsStateWithLifecycle()
+
         LaunchedEffect(loggedIn) {
             if (!loggedIn) {
                 navigator.navigateUp()
@@ -106,6 +110,7 @@ fun Main(
                     onCancelDeleteCache = ::cancelDeleteCache,
                     onDeleteCache = ::deleteCache,
                     modifier = Modifier.padding(contentPadding),
+                    loading = loading,
                 )
 
                 MainScreen.Caches -> CachesScreen(
@@ -128,6 +133,7 @@ fun Main(
                     onChangePassword = { navigator.navigate(ChangePasswordDestination) },
                     onLogout = ::logout,
                     modifier = Modifier.padding(contentPadding),
+                    disabledFind = disabledFind,
                 )
             }
         }

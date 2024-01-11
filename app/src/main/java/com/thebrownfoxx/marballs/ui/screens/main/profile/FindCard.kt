@@ -1,5 +1,6 @@
 package com.thebrownfoxx.marballs.ui.screens.main.profile
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -8,6 +9,7 @@ import androidx.compose.material.icons.twotone.Close
 import androidx.compose.material.icons.twotone.LocationOn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,6 +33,7 @@ fun FindCard(
     find: FindInfo,
     onClick: () -> Unit,
     onUnfind: () -> Unit,
+    loading: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -60,12 +63,20 @@ fun FindCard(
                 icon = Icons.TwoTone.LocationOn,
                 value = find.cache.location,
             )
+            AnimatedVisibility(visible = loading) {
+                LinearProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 24.dp),
+                )
+            }
             VerticalSpacer(height = 16.dp)
             FilledTonalButton(
                 icon = Icons.TwoTone.Close,
                 iconContentDescription = null,
                 text = "Not found",
                 onClick = onUnfind,
+                enabled = !loading,
                 modifier = Modifier.fillMaxWidth(),
             )
             VerticalSpacer(height = 8.dp)
@@ -94,6 +105,7 @@ fun FindCardPreview() {
             ),
             onClick = {},
             onUnfind = {},
+            loading = true,
         )
     }
 }

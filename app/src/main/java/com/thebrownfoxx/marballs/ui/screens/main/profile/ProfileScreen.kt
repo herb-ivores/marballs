@@ -54,6 +54,7 @@ fun ProfileScreen(
     onReload: () -> Unit,
     onChangePassword: () -> Unit,
     onLogout: () -> Unit,
+    disabledFind: FindInfo?,
     modifier: Modifier = Modifier,
 ) {
     val topAppBarScrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -123,6 +124,7 @@ fun ProfileScreen(
                         find = find,
                         onClick = { onFindSelect(find) },
                         onUnfind = { onUnmarkFindAsFound(find) },
+                        loading = find == disabledFind,
                     )
                 }
             }
@@ -189,6 +191,7 @@ fun ProfileScreenPreview() {
             onReload = {},
             onChangePassword = {},
             onLogout = {},
+            disabledFind = null
         )
     }
 }
