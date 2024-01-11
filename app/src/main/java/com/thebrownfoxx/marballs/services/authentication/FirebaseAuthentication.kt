@@ -4,14 +4,19 @@ import com.google.firebase.auth.FirebaseAuth
 import com.thebrownfoxx.extensions.mapToStateFlow
 import com.thebrownfoxx.marballs.domain.Outcome
 import com.thebrownfoxx.marballs.domain.User
+import com.thebrownfoxx.marballs.services.awaitOutcome
 import com.thebrownfoxx.marballs.services.awaitUnitOutcome
+import com.thebrownfoxx.marballs.services.user.UserRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 
-class FirebaseAuthentication(private val auth: FirebaseAuth) : Authentication {
+class FirebaseAuthentication(
+    private val auth: FirebaseAuth,
+    private val userRepository: UserRepository
+) : Authentication {
     private val scope = CoroutineScope(Dispatchers.Main)
 
     private val _currentUser = MutableStateFlow<User?>(null)
@@ -28,15 +33,27 @@ class FirebaseAuthentication(private val auth: FirebaseAuth) : Authentication {
         }
     }
 
-    override suspend fun signup(email: String, password: String): Outcome<Unit> = withContext(Dispatchers.IO) {
-        return@withContext auth.createUserWithEmailAndPassword(email, password).awaitUnitOutcome()
-    }
+    override suspend fun signup(email: String, password: String): Outcome<Unit> =
+        withContext(Dispatchers.IO) {
+            return@withContext auth.createUserWithEmailAndPassword(email, password)
+                .awaitOutcome()
+                .also { outcome ->
+                    if (outcome is Outcome.Success) {
+                        userRepository.addUser(
+                            User(
+                                uid = outcome.data.user?.uid ?: "",
+                                email = email,
+                            )
+                        )
+                    }
+                }.map { }
+        }
 
-    override suspend fun login(email: String, password: String): Outcome<Unit> = withContext(Dispatchers.IO) {
-        return@withContext auth.signInWithEmailAndPassword(email, password)
-            .awaitUnitOutcome()
-            .also { updateCurrentUser() }
-    }
+
+    override suspend fun login(email: String, password: String): Outcome<Unit> =
+        withContext(Dispatchers.IO) {
+            return@withContext auth.signInWithEmailAndPassword(email, password).awaitUnitOutcome()
+        }
 
     override fun logout() {
         auth.signOut()
