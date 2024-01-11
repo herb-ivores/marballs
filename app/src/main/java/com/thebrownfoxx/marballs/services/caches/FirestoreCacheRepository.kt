@@ -6,8 +6,10 @@ import com.thebrownfoxx.marballs.domain.Location
 import com.thebrownfoxx.marballs.domain.Outcome
 import com.thebrownfoxx.marballs.services.awaitOutcome
 import com.thebrownfoxx.marballs.services.awaitUnitOutcome
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.withContext
 
 
 class FirestoreCacheRepository(private val firestore: FirebaseFirestore) : CacheRepository {
@@ -39,8 +41,8 @@ class FirestoreCacheRepository(private val firestore: FirebaseFirestore) : Cache
             }
     }
 
-    override suspend fun getCache(cacheId: String): Outcome<Cache?> {
-        return firestore.collection("caches")
+    override suspend fun getCache(cacheId: String): Outcome<Cache?> = withContext(Dispatchers.IO) {
+        return@withContext firestore.collection("caches")
             .document(cacheId)
             .get()
             .awaitOutcome()
@@ -58,7 +60,7 @@ class FirestoreCacheRepository(private val firestore: FirebaseFirestore) : Cache
             }
     }
 
-    override suspend fun addCache(cache: Cache): Outcome<Unit> {
+    override suspend fun addCache(cache: Cache): Outcome<Unit> = withContext(Dispatchers.IO) {
         val cacheMap = mapOf(
             "name" to cache.name,
             "description" to cache.description,
@@ -66,22 +68,22 @@ class FirestoreCacheRepository(private val firestore: FirebaseFirestore) : Cache
             "latitude" to cache.location.latitude,
             "longitude" to cache.location.longitude,
         )
-        return firestore.collection("caches")
+        return@withContext firestore.collection("caches")
             .add(cacheMap)
             .awaitUnitOutcome()
             .also { updateCaches() }
     }
 
-    override suspend fun updateCache(cache: Cache): Outcome<Unit> {
-        return firestore.collection("caches").document(cache.id!!)
+    override suspend fun updateCache(cache: Cache): Outcome<Unit> = withContext(Dispatchers.IO) {
+        return@withContext firestore.collection("caches").document(cache.id!!)
             .set(cache)
             .awaitOutcome()
             .map { }
             .also { updateCaches() }
     }
 
-    override suspend fun removeCache(cache: Cache): Outcome<Unit> {
-        return firestore.collection("caches").document(cache.id!!)
+    override suspend fun removeCache(cache: Cache): Outcome<Unit> = withContext(Dispatchers.IO) {
+        return@withContext firestore.collection("caches").document(cache.id!!)
             .delete()
             .awaitOutcome()
             .map { }
