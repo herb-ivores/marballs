@@ -2,7 +2,6 @@ package com.thebrownfoxx.marballs.ui.screens.main
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.twotone.List
-import androidx.compose.material.icons.twotone.Checklist
 import androidx.compose.material.icons.twotone.Map
 import androidx.compose.material.icons.twotone.Person
 import androidx.compose.material3.Icon
@@ -29,7 +28,6 @@ fun BottomBar(
                         imageVector = when (screen) {
                             MainScreen.Map -> Icons.TwoTone.Map
                             MainScreen.Caches -> Icons.AutoMirrored.TwoTone.List
-                            MainScreen.Finds -> Icons.TwoTone.Checklist
                             MainScreen.Profile -> Icons.TwoTone.Person
                         },
                         contentDescription = null,

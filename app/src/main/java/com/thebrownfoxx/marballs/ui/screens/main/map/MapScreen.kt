@@ -27,10 +27,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.rememberMarkerState
 import com.thebrownfoxx.components.HorizontalSpacer
 import com.thebrownfoxx.components.VerticalSpacer
 import com.thebrownfoxx.components.extension.minus
@@ -46,21 +50,27 @@ import com.thebrownfoxx.marballs.ui.theme.AppTheme
 @Suppress("UNUSED_VARIABLE")
 @Composable
 fun MapScreen(
-    currentLocation: Location?,
+    location: Location?,
+    caches: List<CacheInfo>,
     selectedCache: CacheInfo?,
     allowCacheEdit: Boolean,
     selectedCacheFound: Boolean,
+    onSelectCache: (CacheInfo) -> Unit,
     onMarkSelectedCacheAsFound: () -> Unit,
     onUnmarkSelectedCacheAsFound: () -> Unit,
     onResetLocation: () -> Unit,
     onAddCache: () -> Unit,
     onEditCache: () -> Unit,
+    deleteDialogVisible: Boolean,
+    onInitiateDeleteCache: () -> Unit,
+    onCancelDeleteCache: () -> Unit,
+    onDeleteCache: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val cameraPositionState = remember(currentLocation?.key.toString()) {
+    val cameraPositionState = remember(location?.key.toString()) {
         CameraPositionState(
             position = CameraPosition.fromLatLngZoom(
-                currentLocation?.toLatLng() ?: LatLng(0.0, 0.0),
+                location?.toLatLng() ?: LatLng(0.0, 0.0),
                 15f,
             ),
         )
@@ -123,6 +133,7 @@ fun MapScreen(
                     onMarkAsFound = onMarkSelectedCacheAsFound,
                     onUnmarkAsFound = onUnmarkSelectedCacheAsFound,
                     onEdit = onEditCache,
+                    onDelete = onInitiateDeleteCache,
                     modifier = Modifier
                         .padding(PaddingValues(16.dp) - PaddingValues(top = 16.dp)),
                 )
@@ -130,8 +141,31 @@ fun MapScreen(
         }
     ) { contentPadding ->
         val ignored = contentPadding
-        GoogleMap(cameraPositionState = cameraPositionState)
+        GoogleMap(
+            cameraPositionState = cameraPositionState,
+            uiSettings = MapUiSettings(zoomControlsEnabled = false),
+        ) {
+            caches.forEach { cache ->
+                Marker(
+                    state = rememberMarkerState(position = cache.coordinates.toLatLng()),
+                    onClick = {
+                        onSelectCache(cache)
+                        true
+                    },
+                    icon = BitmapDescriptorFactory.defaultMarker(
+                        if (selectedCache?.id == cache.id) BitmapDescriptorFactory.HUE_RED
+                        else BitmapDescriptorFactory.HUE_ORANGE
+                    ),
+                )
+            }
+        }
     }
+    DeleteCacheDialog(
+        visible = deleteDialogVisible,
+        cacheName = selectedCache?.name.orEmpty(),
+        onConfirm = onDeleteCache,
+        onDismiss = onCancelDeleteCache,
+    )
 }
 
 @Preview
@@ -139,8 +173,10 @@ fun MapScreen(
 fun MapScreenPreview() {
     AppTheme {
         MapScreen(
-            currentLocation = null,
+            location = null,
+            caches = emptyList(),
             selectedCache = null,
+            onSelectCache = {},
             allowCacheEdit = true,
             selectedCacheFound = false,
             onMarkSelectedCacheAsFound = {},
@@ -148,6 +184,10 @@ fun MapScreenPreview() {
             onResetLocation = {},
             onEditCache = {},
             onAddCache = {},
+            deleteDialogVisible = false,
+            onInitiateDeleteCache = {},
+            onCancelDeleteCache = {},
+            onDeleteCache = {},
         )
     }
 }
@@ -157,7 +197,8 @@ fun MapScreenPreview() {
 fun MapScreenWithCachePreview() {
     AppTheme {
         MapScreen(
-            currentLocation = null,
+            location = null,
+            caches = emptyList(),
             selectedCache = CacheInfo(
                 id = "1",
                 name = "Sample Cache",
@@ -165,8 +206,9 @@ fun MapScreenWithCachePreview() {
                 location = "Test Avenue, Test Tease City",
                 distance = 69.69.meters,
                 author = User(uid = "1", email = "jonelespiritu@fuckers-online.io"),
-                coordinates = Location(19.2132,121.3242)
+                coordinates = Location(19.2132, 121.3242)
             ),
+            onSelectCache = {},
             allowCacheEdit = true,
             selectedCacheFound = false,
             onMarkSelectedCacheAsFound = {},
@@ -174,6 +216,10 @@ fun MapScreenWithCachePreview() {
             onEditCache = {},
             onResetLocation = {},
             onAddCache = {},
+            deleteDialogVisible = false,
+            onInitiateDeleteCache = {},
+            onCancelDeleteCache = {},
+            onDeleteCache = {},
         )
     }
 }

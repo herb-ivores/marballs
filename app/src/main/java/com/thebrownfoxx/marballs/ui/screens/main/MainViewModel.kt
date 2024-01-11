@@ -1,5 +1,6 @@
 package com.thebrownfoxx.marballs.ui.screens.main
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.thebrownfoxx.extensions.combineToStateFlow
@@ -17,8 +18,11 @@ import com.thebrownfoxx.marballs.services.finds.FindsRepository
 import com.thebrownfoxx.marballs.services.location.LocationProvider
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class MainViewModel(
@@ -29,27 +33,29 @@ class MainViewModel(
     private val findsRepository: FindsRepository,
     private val findInfoProvider: FindInfoProvider,
 ) : ViewModel() {
+    private val _errors = MutableSharedFlow<String>()
+    val errors = _errors.asSharedFlow()
+
     val loggedIn = authentication.loggedIn
+
+    val currentUser = authentication.currentUser
+
+    private val reload = MutableSharedFlow<Unit>()
 
     private val _currentScreen = MutableStateFlow(MainScreen.Map)
     val currentScreen = _currentScreen.asStateFlow()
-
-    init {
-        viewModelScope.launch {
-            locationProvider.updateLocation()
-        }
-    }
 
     fun navigateTo(screen: MainScreen) {
         _currentScreen.value = screen
     }
 
-    fun logout() {
-        authentication.logout()
-    }
-
     // Map screen
-    val currentLocation = locationProvider.currentLocation
+    private val _location = MutableStateFlow(locationProvider.currentLocation.value)
+    val location = _location.asStateFlow()
+
+    init {
+        resetLocation()
+    }
 
     private val _selectedCache = MutableStateFlow<CacheInfo?>(null)
     val selectedCache = _selectedCache.asStateFlow()
@@ -59,7 +65,7 @@ class MainViewModel(
         selectedCache,
         scope = viewModelScope,
     ) { currentUser, selectedCache ->
-        currentUser == selectedCache?.author
+        currentUser?.uid == selectedCache?.author?.uid
     }
 
     val selectedCacheFound = combineToStateFlow(
@@ -70,6 +76,9 @@ class MainViewModel(
     ) { currentUser, selectedCache, finds ->
         finds?.any { it.cacheId == selectedCache?.id && it.finderId == currentUser?.uid } ?: false
     }
+
+    private val _deleteDialogVisible = MutableStateFlow(false)
+    val deleteDialogVisible = _deleteDialogVisible.asStateFlow()
 
     fun markSelectedCacheAsFound() {
         val selectedCache = selectedCache.value
@@ -85,7 +94,7 @@ class MainViewModel(
                 )
                 if (outcome is Outcome.Failure) {
                     viewModelScope.launch {
-                        _findsErrors.emit(outcome.throwableMessage)
+                        _errors.emit(outcome.throwableMessage)
                     }
                 }
             }
@@ -96,20 +105,35 @@ class MainViewModel(
         val selectedCache = selectedCache.value
         val currentUser = authentication.currentUser.value
         if (selectedCache != null && currentUser != null) {
-//            findsRepository.removeFind(selectedCache.id) { outcome ->
-//                if (outcome is Outcome.Failure) {
-//                    viewModelScope.launch {
-//                        _findsErrors.emit(outcome.throwableMessage)
-//                    }
-//                }
-//            }
             viewModelScope.launch {
                 val outcome = findsRepository.removeFind(selectedCache.id)
                 if (outcome is Outcome.Failure) {
-                    viewModelScope.launch {
-                        _findsErrors.emit(outcome.throwableMessage)
-                    }
+                    _errors.emit(outcome.throwableMessage)
                 }
+            }
+        }
+    }
+
+    fun initiateDeleteCache() {
+        if (selectedCache.value != null) {
+            _deleteDialogVisible.value = true
+        }
+    }
+
+    fun cancelDeleteCache() {
+        _deleteDialogVisible.value = false
+    }
+
+    fun deleteCache() {
+        val selectedCache = selectedCache.value
+        if (selectedCache != null) {
+            viewModelScope.launch {
+                val outcome = cacheRepository.removeCache(selectedCache.id)
+                if (outcome is Outcome.Failure) {
+                    _errors.emit(outcome.throwableMessage)
+                }
+                _deleteDialogVisible.value = false
+                _selectedCache.value = null
             }
         }
     }
@@ -117,6 +141,7 @@ class MainViewModel(
     fun resetLocation() {
         viewModelScope.launch {
             locationProvider.updateLocation()
+            _location.value = locationProvider.currentLocation.value
         }
     }
 
@@ -124,40 +149,27 @@ class MainViewModel(
     private val _cachesSearchQuery = MutableStateFlow("")
     val cachesSearchQuery = _cachesSearchQuery.asStateFlow()
 
-    private val _caches = MutableStateFlow<List<CacheInfo>?>(null)
-    val caches = _caches.asStateFlow()
-
-    /*    val caches = combineToStateFlow(
-            cachesSearchQuery,
-            cacheRepository.caches,
-            locationProvider.currentLocation,
-            scope = viewModelScope,
-        ) { searchQuery, caches, currentLocation ->
-            with(cacheInfoProvider) {
-                caches?.map { cache ->
-                    cache.toCacheInfo(currentLocation ?: Location(0.0, 0.0))
-                }?.search(searchQuery) { it.name }
-            }
-        }*/
-    init {
-        viewModelScope.launch {
-            cachesSearchQuery.collect { searchQuery ->
-                locationProvider.currentLocation.collect { currentLocation ->
-                    cacheRepository.caches.collect { caches ->
-                        val outcome = with(cacheInfoProvider) {
-                            caches?.map { cache ->
-                                cache.toCacheInfo(currentLocation ?: Location(0.0, 0.0))
-                            }
-                        }
-                        if (outcome?.all { it is Outcome.Success } == true) {
-                            _caches.value = outcome.map { (it as Outcome.Success).data }
-                                .search(searchQuery) { it.name }
-                        }
-                    }
-                }
+    val caches = combine(
+        cachesSearchQuery,
+        cacheRepository.caches,
+        locationProvider.currentLocation,
+    ) { searchQuery, caches, currentLocation ->
+        Log.d(this::class.simpleName, "caches: $caches")
+        val outcomes = with(cacheInfoProvider) {
+            caches?.map { cache ->
+                cache.toCacheInfo(
+                    currentLocation ?: Location(0.0, 0.0)
+                )
             }
         }
-    }
+        if (outcomes == null || outcomes.any { it is Outcome.Failure }) {
+            emptyList()
+        } else {
+            outcomes.filterIsInstance<Outcome.Success<CacheInfo>>()
+                .map { it.data }
+                .search(searchQuery) { it.name }
+        }
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     fun setCachesSearchQuery(query: String) {
         _cachesSearchQuery.value = query
@@ -166,35 +178,29 @@ class MainViewModel(
     fun selectCache(cache: CacheInfo) {
         _currentScreen.value = MainScreen.Map
         _selectedCache.value = cache
+        _location.value = cache.coordinates
     }
-
-    // Finds screen
-    private val _findsErrors = MutableSharedFlow<String>()
-    val findsErrors = _findsErrors.asSharedFlow()
 
     private val _findsSearchQuery = MutableStateFlow("")
     val findsSearchQuery = _findsSearchQuery.asStateFlow()
 
-    private val _finds = MutableStateFlow<List<FindInfo>?>(null)
-    val finds = _finds.asStateFlow()
-
-    init {
-        viewModelScope.launch {
-            findsSearchQuery.collect { searchQuery ->
-                findsRepository.finds.collect { finds ->
-                    val outcome = with(findInfoProvider) {
-                        finds?.map { find ->
-                            find.toFindInfo()
-                        }
-                    }
-                    if (outcome?.all { it is Outcome.Success } == true) {
-                        _finds.value = outcome.map { (it as Outcome.Success).data }
-                            .search(searchQuery) { it.cache.name }
-                    }
-                }
+    val finds = combine(
+        findsSearchQuery,
+        findsRepository.finds,
+    ) { searchQuery, finds ->
+        val outcomes = with(findInfoProvider) {
+            finds?.map { find ->
+                find.toFindInfo()
             }
         }
-    }
+        if (outcomes == null || outcomes.any { it is Outcome.Failure }) {
+            emptyList()
+        } else {
+            outcomes.filterIsInstance<Outcome.Success<FindInfo>>()
+                .map { it.data }
+                .search(searchQuery) { it.cache.name }
+        }
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     fun setFindsSearchQuery(query: String) {
         _findsSearchQuery.value = query
@@ -210,9 +216,21 @@ class MainViewModel(
             val outcome = findsRepository.removeFind(find.cache.id)
             if (outcome is Outcome.Failure) {
                 viewModelScope.launch {
-                    _findsErrors.emit(outcome.throwableMessage)
+                    _errors.emit(outcome.throwableMessage)
                 }
             }
+        }
+    }
+
+    fun logout() {
+        authentication.logout()
+    }
+
+    fun reload() {
+        viewModelScope.launch {
+            cacheRepository.updateCaches()
+            findsRepository.updateFinds()
+            reload.emit(Unit)
         }
     }
 }

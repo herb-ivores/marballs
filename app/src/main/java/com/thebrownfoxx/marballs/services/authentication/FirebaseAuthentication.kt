@@ -49,11 +49,11 @@ class FirebaseAuthentication(
                 }.map { }
         }
 
-
-    override suspend fun login(email: String, password: String): Outcome<Unit> =
-        withContext(Dispatchers.IO) {
-            return@withContext auth.signInWithEmailAndPassword(email, password).awaitUnitOutcome()
-        }
+    override suspend fun login(email: String, password: String): Outcome<Unit> = withContext(Dispatchers.IO) {
+        return@withContext auth.signInWithEmailAndPassword(email, password)
+            .awaitUnitOutcome()
+            .also { updateCurrentUser() }
+    }
 
     override fun logout() {
         auth.signOut()

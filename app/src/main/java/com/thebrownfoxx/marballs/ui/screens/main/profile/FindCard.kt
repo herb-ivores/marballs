@@ -1,4 +1,4 @@
-package com.thebrownfoxx.marballs.ui.screens.main.finds
+package com.thebrownfoxx.marballs.ui.screens.main.profile
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -64,7 +64,7 @@ fun FindCard(
             FilledTonalButton(
                 icon = Icons.TwoTone.Close,
                 iconContentDescription = null,
-                text = "Unmark as found",
+                text = "Not found",
                 onClick = onUnfind,
                 modifier = Modifier.fillMaxWidth(),
             )

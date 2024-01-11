@@ -6,22 +6,28 @@ import com.thebrownfoxx.marballs.domain.Location
 import com.thebrownfoxx.marballs.domain.Outcome
 import com.thebrownfoxx.marballs.services.awaitOutcome
 import com.thebrownfoxx.marballs.services.awaitUnitOutcome
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
 
 class FirestoreCacheRepository(private val firestore: FirebaseFirestore) : CacheRepository {
+    val scope = CoroutineScope(Dispatchers.IO)
 
     private val _caches = MutableStateFlow<List<Cache>?>(null)
     override val caches = _caches.asStateFlow()
 
     init {
-        updateCaches()
+        scope.launch {
+            updateCaches()
+        }
     }
 
-    fun updateCaches() {
+    override suspend fun updateCaches() {
         firestore.collection("caches")
             .get()
             .addOnSuccessListener { results ->
@@ -39,6 +45,7 @@ class FirestoreCacheRepository(private val firestore: FirebaseFirestore) : Cache
                     )
                 }
             }
+            .await()
     }
 
     override suspend fun getCache(cacheId: String): Outcome<Cache?> = withContext(Dispatchers.IO) {
@@ -82,8 +89,8 @@ class FirestoreCacheRepository(private val firestore: FirebaseFirestore) : Cache
             .also { updateCaches() }
     }
 
-    override suspend fun removeCache(cache: Cache): Outcome<Unit> = withContext(Dispatchers.IO) {
-        return@withContext firestore.collection("caches").document(cache.id!!)
+    override suspend fun removeCache(cacheId: String): Outcome<Unit> = withContext(Dispatchers.IO) {
+        return@withContext firestore.collection("caches").document(cacheId)
             .delete()
             .awaitOutcome()
             .map { }
