@@ -40,7 +40,7 @@ class FirestoreCacheRepository(private val firestore: FirebaseFirestore) : Cache
                             it.getDouble("latitude") ?: 0.0,
                             it.getDouble("longitude") ?: 0.0
                         ),
-                        authorUid = it.getString("authorUid") ?: ""
+                        authorUid = it.getString("author") ?: ""
 
                     )
                 }
@@ -62,7 +62,7 @@ class FirestoreCacheRepository(private val firestore: FirebaseFirestore) : Cache
                         result.getDouble("latitude") ?: 0.0,
                         result.getDouble("longitude") ?: 0.0
                     ),
-                    authorUid = result.getString("authorUid") ?: ""
+                    authorUid = result.getString("author") ?: ""
                 )
             }
     }
