@@ -218,14 +218,11 @@ class MainViewModel(
                 find.toFindInfo()
             }
         }
-        if (outcomes == null || outcomes.any { it is Outcome.Failure }) {
-            emptyList()
-        } else {
-            outcomes.filterIsInstance<Outcome.Success<FindInfo>>()
-                .map { it.data }
-                .search(searchQuery) { it.cache.name }
-                .filter { it.finder.uid == currentUser?.uid }
-        }
+        outcomes?.filterIsInstance<Outcome.Success<FindInfo>>()
+            ?.map { it.data }
+            ?.search(searchQuery) { it.cache.name }
+            ?.filter { it.finder.uid == currentUser?.uid }
+            ?: emptyList()
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     fun setFindsSearchQuery(query: String) {
