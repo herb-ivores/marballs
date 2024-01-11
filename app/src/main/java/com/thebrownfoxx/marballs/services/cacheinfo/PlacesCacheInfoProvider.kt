@@ -21,6 +21,7 @@ import com.thebrownfoxx.marballs.domain.User
 import com.thebrownfoxx.marballs.extensions.distanceTo
 import com.thebrownfoxx.marballs.services.authentication.Authentication
 import com.thebrownfoxx.marballs.services.awaitOutcome
+import com.thebrownfoxx.marballs.services.user.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -31,6 +32,7 @@ class PlacesFirebaseCacheInfoService(
     private val placesClient: PlacesClient,
     private val auth: Authentication,
     private val application: Application,
+    private val userRepository: UserRepository
 ) : CacheInfoProvider {
     /*    override fun Cache.toCacheInfo(currentLocation: Location): CacheInfo {
         var infoHolder = CacheInfo(
@@ -184,19 +186,18 @@ class PlacesFirebaseCacheInfoService(
         }
 
 
+
         val placeFields = listOf(Place.Field.ID, Place.Field.NAME)
-
-        Log.d(this::class.simpleName, "placeID: $placeId")
         val request = FetchPlaceRequest.newInstance(placeId, placeFields)
-
         return@withContext placesClient.fetchPlace(request).awaitOutcome().map {
             val place = it.place
             Log.i("PlacesFirebaseCacheInfoService", "Place found: ${place.name}")
             val locationName = place.name.orEmpty()
             Log.d("PlacesFirebaseCacheInfoService", "Current Location: $currentLocation, Location: $location")
             val distance = currentLocation.distanceTo(location)
-            val author = User("defaultUid", "defaultDisplayName")
-            Log.i("PlacesFirebaseCacheInfoService", "CacheInfo: $locationName, $distance, $author")
+            val user = userRepository.users.value?.first() ?: User("DefaultUID", "DefaultEmail")
+            //val author = User("defaultUid", "defaultDisplayName")
+            Log.i("PlacesFirebaseCacheInfoService", "CacheInfo: $locationName, Distance = $distance, Author: $user")
             CacheInfo(
                 id = id ?: "DefaultID",
                 name = name,
@@ -204,7 +205,7 @@ class PlacesFirebaseCacheInfoService(
                 coordinates = location,
                 location = locationName,
                 distance = distance,
-                author = auth.currentUser.value ?: author
+                author = user
             )
         }
     }

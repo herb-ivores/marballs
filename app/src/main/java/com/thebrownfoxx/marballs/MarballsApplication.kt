@@ -10,9 +10,11 @@ import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.thebrownfoxx.marballs.services.authentication.Authentication
 import com.thebrownfoxx.marballs.services.authentication.DummyAuthentication
+import com.thebrownfoxx.marballs.services.authentication.FirebaseAuthentication
 import com.thebrownfoxx.marballs.services.cacheinfo.CacheInfoProvider
 import com.thebrownfoxx.marballs.services.cacheinfo.DummyCacheInfoProvider
 import com.thebrownfoxx.marballs.services.cacheinfo.PlacesFirebaseCacheInfoService
@@ -26,6 +28,8 @@ import com.thebrownfoxx.marballs.services.finds.FindsRepository
 import com.thebrownfoxx.marballs.services.location.DummyLocationProvider
 import com.thebrownfoxx.marballs.services.location.GoogleLocationProvider
 import com.thebrownfoxx.marballs.services.location.LocationProvider
+import com.thebrownfoxx.marballs.services.user.FireBaseUserRepository
+import com.thebrownfoxx.marballs.services.user.UserRepository
 
 class MarballsApplication: Application() {
     private lateinit var firebaseAuth: FirebaseAuth
@@ -50,11 +54,15 @@ class MarballsApplication: Application() {
     private lateinit var _findInfoProvider: FindInfoProvider
     val findInfoProvider get() = _findInfoProvider
 
+    private lateinit var userRepository: UserRepository
+
     override fun onCreate() {
         super.onCreate()
         firebaseAuth = Firebase.auth
+        firestore = Firebase.firestore
+        userRepository = FireBaseUserRepository(firestore)
 //        _authService = FirebaseAuthentication(firebaseAuth)
-        _authentication = DummyAuthentication()
+        _authentication = FirebaseAuthentication(firebaseAuth, userRepository)
 
         fusedLocationProviderClient = LocationServices
             .getFusedLocationProviderClient(applicationContext)
@@ -63,22 +71,16 @@ class MarballsApplication: Application() {
             application = this,
         )
 //        _locationProvider = DummyLocationProvider()
-
-        firestore = FirebaseFirestore.getInstance()
         _cacheRepository = FirestoreCacheRepository(firestore)
 //        _cacheRepository = DummyCacheRepository()
-
         Places.initialize(applicationContext, BuildConfig.MAPS_API_KEY)
         placesClient = Places.createClient(applicationContext)
-        _cacheInfoProvider = DummyCacheInfoProvider()
-
+        _cacheInfoProvider = PlacesFirebaseCacheInfoService(placesClient, authentication, this, userRepository)
         _findsRepository = DummyFindsRepository()
-
         _findInfoProvider = DummyFindInfoProvider(
             cacheRepository = cacheRepository,
             cacheInfoProvider = cacheInfoProvider,
         )
-        _cacheInfoProvider = PlacesFirebaseCacheInfoService(placesClient, authentication, this)
     }
 }
 
