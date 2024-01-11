@@ -97,6 +97,14 @@ class FirestoreCacheRepository(private val firestore: FirebaseFirestore) : Cache
     }
 
     override suspend fun removeCache(cacheId: String): Outcome<Unit> = withContext(Dispatchers.IO) {
+        firestore.collection("finds").whereEqualTo("cacheId", cacheId)
+            .get()
+            .awaitOutcome()
+            .map { results ->
+                results.forEach {
+                    it.reference.delete()
+                }
+            }
         return@withContext firestore.collection("caches").document(cacheId)
             .delete()
             .awaitOutcome()
