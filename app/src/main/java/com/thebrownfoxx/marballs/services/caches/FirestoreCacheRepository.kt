@@ -89,7 +89,7 @@ class FirestoreCacheRepository(private val firestore: FirebaseFirestore) : Cache
             "latitude" to cache.location.latitude,
             "longitude" to cache.location.longitude,
         )
-        return@withContext firestore.collection("caches").document(cache.id!!)
+        return@withContext firestore.collection("caches").document(cache.id ?: "")
             .set(cacheMap)
             .awaitOutcome()
             .map { }

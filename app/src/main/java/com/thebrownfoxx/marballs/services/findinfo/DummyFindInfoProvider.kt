@@ -18,8 +18,8 @@ class DummyFindInfoProvider(
 ): FindInfoProvider {
     override suspend fun Find.toFindInfo(): Outcome<FindInfo> {
         val cache = with(cacheInfoProvider) {
-            cacheRepository.caches.value?.first { it.id == cacheId }
-                ?.toCacheInfo(Location(0.0, 0.0))!!
+            cacheRepository.caches.value?.firstOrNull { it.id == cacheId }
+                ?.toCacheInfo(Location(0.0, 0.0))
         }
 
         return when (cache) {
@@ -36,6 +36,7 @@ class DummyFindInfoProvider(
             is Outcome.Failure -> {
                 Outcome.Failure(cache.throwable)
             }
+            null -> Outcome.Failure(IllegalStateException("Cache not found"))
         }
     }
 }

@@ -61,7 +61,9 @@ class FireStoreFindsRepository(private val firestore: FirebaseFirestore) : Finds
         if (outcome is Outcome.Failure) {
             return@withContext Outcome.Failure(outcome.throwable)
         }
-        (outcome as Outcome.Success).data.first().reference.delete().awaitUnitOutcome()
+        val document = (outcome as Outcome.Success).data.firstOrNull()
+        (document?.reference?.delete()?.awaitUnitOutcome()
+            ?: Outcome.Failure(IllegalStateException("Not found")))
             .also { updateFinds() }
     }
 

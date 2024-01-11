@@ -101,7 +101,7 @@ fun Main(
                     onMarkSelectedCacheAsFound = ::markSelectedCacheAsFound,
                     onUnmarkSelectedCacheAsFound = ::unmarkSelectedCacheAsFound,
                     onEditCache = {
-                        navigator.navigate(EditCacheDestination(selectedCache?.id!!))
+                        navigator.navigate(EditCacheDestination(selectedCache?.id ?: ""))
                     },
                     onResetLocation = ::resetLocation,
                     onAddCache = { navigator.navigate(AddCacheDestination) },

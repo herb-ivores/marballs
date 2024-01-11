@@ -7,7 +7,6 @@ import com.thebrownfoxx.marballs.domain.Outcome
 import com.thebrownfoxx.marballs.domain.User
 import com.thebrownfoxx.marballs.services.cacheinfo.CacheInfoProvider
 import com.thebrownfoxx.marballs.services.caches.CacheRepository
-import com.thebrownfoxx.marballs.services.finds.FindsRepository
 import com.thebrownfoxx.marballs.services.user.UserRepository
 import java.time.Instant
 import kotlin.random.Random
@@ -20,8 +19,8 @@ class FirestoreFindInfoRepository(
 
     override suspend fun Find.toFindInfo(): Outcome<FindInfo> {
         val cache = with(cacheInfoProvider) {
-            cacheRepository.caches.value?.first { it.id == cacheId }
-                ?.toCacheInfo(Location(0.0, 0.0))!!
+            cacheRepository.caches.value?.firstOrNull { it.id == cacheId }
+                ?.toCacheInfo(Location(0.0, 0.0))
         }
 
         val findUserOutcome = userRepository.getUserById(finderId)
@@ -30,13 +29,13 @@ class FirestoreFindInfoRepository(
             is Outcome.Failure -> null
         }
 
-        return cache.map {
+        return cache?.map {
             FindInfo(
                 id = id ?: Random.nextDouble().toString(),
                 cache = it,
                 found = Instant.ofEpochMilli(foundEpochMillis),
                 finder = finder ?: User(uid = "retger", email = "edgfr")
             )
-        }
+        } ?: Outcome.Failure(Exception("Cache not found"))
     }
 }

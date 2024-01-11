@@ -195,7 +195,7 @@ class PlacesFirebaseCacheInfoService(
             val locationName = place.name.orEmpty()
             Log.d("PlacesFirebaseCacheInfoService", "Current Location: $currentLocation, Location: $location")
             val distance = currentLocation.distanceTo(location)
-            val user = userRepository.users.value?.first { user -> user.uid == authorUid } ?: User("DefaultUID", "DefaultEmail")
+            val user = userRepository.users.value?.firstOrNull { user -> user.uid == authorUid } ?: User("DefaultUID", "DefaultEmail")
             //val author = User("defaultUid", "defaultDisplayName")
             Log.i("PlacesFirebaseCacheInfoService", "CacheInfo: $locationName, Distance = $distance, Author: $user")
             CacheInfo(

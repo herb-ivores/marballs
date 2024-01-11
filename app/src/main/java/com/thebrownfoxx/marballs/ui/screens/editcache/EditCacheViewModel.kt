@@ -82,7 +82,14 @@ class EditCacheViewModel(
         _loading.value = true
 
         val cache = cache.value
-        if (cache!!.name.isBlank() || cache.description.isBlank()) {
+        if (cache == null) {
+            viewModelScope.launch {
+                _errors.emit("Cache not found")
+            }
+            _loading.value = false
+            return
+        }
+        if (cache.name.isBlank() || cache.description.isBlank()) {
             viewModelScope.launch {
                 _errors.emit("Please fill out all fields")
             }
