@@ -3,6 +3,7 @@ package com.thebrownfoxx.marballs.services.location
 import android.Manifest
 import android.app.Application
 import android.content.pm.PackageManager
+import android.util.Log
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.thebrownfoxx.marballs.domain.Location
@@ -23,7 +24,7 @@ class GoogleLocationProvider(
             ContextCompat.checkSelfPermission(
                 application,
                 Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED ||
+            ) != PackageManager.PERMISSION_GRANTED &&
             ContextCompat.checkSelfPermission(
                 application,
                 Manifest.permission.ACCESS_COARSE_LOCATION
@@ -33,6 +34,7 @@ class GoogleLocationProvider(
         }
         return fusedLocationClient.lastLocation.awaitOutcome()
             .also {
+                Log.d(this::class.simpleName, "updateLocation: $it")
                 if (it is Outcome.Success) {
                     _currentLocation.value = Location(it.data.latitude, it.data.longitude)
                 }

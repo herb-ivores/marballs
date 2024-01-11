@@ -7,6 +7,7 @@ import com.thebrownfoxx.extensions.search
 import com.thebrownfoxx.marballs.domain.CacheInfo
 import com.thebrownfoxx.marballs.domain.Find
 import com.thebrownfoxx.marballs.domain.FindInfo
+import com.thebrownfoxx.marballs.domain.Loadable
 import com.thebrownfoxx.marballs.domain.Location
 import com.thebrownfoxx.marballs.domain.Outcome
 import com.thebrownfoxx.marballs.services.authentication.Authentication
@@ -17,8 +18,11 @@ import com.thebrownfoxx.marballs.services.finds.FindsRepository
 import com.thebrownfoxx.marballs.services.location.LocationProvider
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class MainViewModel(
@@ -31,6 +35,8 @@ class MainViewModel(
 ) : ViewModel() {
     val loggedIn = authentication.loggedIn
 
+    val currentUser = authentication.currentUser
+
     private val _currentScreen = MutableStateFlow(MainScreen.Map)
     val currentScreen = _currentScreen.asStateFlow()
 
@@ -42,10 +48,6 @@ class MainViewModel(
 
     fun navigateTo(screen: MainScreen) {
         _currentScreen.value = screen
-    }
-
-    fun logout() {
-        authentication.logout()
     }
 
     // Map screen
@@ -124,40 +126,28 @@ class MainViewModel(
     private val _cachesSearchQuery = MutableStateFlow("")
     val cachesSearchQuery = _cachesSearchQuery.asStateFlow()
 
-    private val _caches = MutableStateFlow<List<CacheInfo>?>(null)
-    val caches = _caches.asStateFlow()
-
-    /*    val caches = combineToStateFlow(
-            cachesSearchQuery,
-            cacheRepository.caches,
-            locationProvider.currentLocation,
-            scope = viewModelScope,
-        ) { searchQuery, caches, currentLocation ->
-            with(cacheInfoProvider) {
-                caches?.map { cache ->
-                    cache.toCacheInfo(currentLocation ?: Location(0.0, 0.0))
-                }?.search(searchQuery) { it.name }
-            }
-        }*/
-    init {
-        viewModelScope.launch {
-            cachesSearchQuery.collect { searchQuery ->
-                locationProvider.currentLocation.collect { currentLocation ->
-                    cacheRepository.caches.collect { caches ->
-                        val outcome = with(cacheInfoProvider) {
-                            caches?.map { cache ->
-                                cache.toCacheInfo(currentLocation ?: Location(0.0, 0.0))
-                            }
-                        }
-                        if (outcome?.all { it is Outcome.Success } == true) {
-                            _caches.value = outcome.map { (it as Outcome.Success).data }
-                                .search(searchQuery) { it.name }
-                        }
-                    }
-                }
+    val caches = combine(
+        cachesSearchQuery,
+        cacheRepository.caches,
+        locationProvider.currentLocation,
+    ) { searchQuery, caches, currentLocation ->
+        val outcomes = with(cacheInfoProvider) {
+            caches?.map { cache ->
+                cache.toCacheInfo(
+                    currentLocation ?: Location(0.0, 0.0)
+                )
             }
         }
-    }
+        if (outcomes == null || outcomes.any { it is Outcome.Failure }) {
+            Loadable.Failure<List<CacheInfo>>(IllegalStateException("Failed to load"))
+        } else {
+            Loadable.Success(
+                outcomes.filterIsInstance<Outcome.Success<CacheInfo>>()
+                    .map { it.data }
+                    .search(searchQuery) { it.name }
+            )
+        }
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, Loadable.Loading<List<CacheInfo>>())
 
     fun setCachesSearchQuery(query: String) {
         _cachesSearchQuery.value = query
@@ -168,33 +158,33 @@ class MainViewModel(
         _selectedCache.value = cache
     }
 
-    // Finds screen
+    // Profile screen
     private val _findsErrors = MutableSharedFlow<String>()
     val findsErrors = _findsErrors.asSharedFlow()
 
     private val _findsSearchQuery = MutableStateFlow("")
     val findsSearchQuery = _findsSearchQuery.asStateFlow()
 
-    private val _finds = MutableStateFlow<List<FindInfo>?>(null)
-    val finds = _finds.asStateFlow()
-
-    init {
-        viewModelScope.launch {
-            findsSearchQuery.collect { searchQuery ->
-                findsRepository.finds.collect { finds ->
-                    val outcome = with(findInfoProvider) {
-                        finds?.map { find ->
-                            find.toFindInfo()
-                        }
-                    }
-                    if (outcome?.all { it is Outcome.Success } == true) {
-                        _finds.value = outcome.map { (it as Outcome.Success).data }
-                            .search(searchQuery) { it.cache.name }
-                    }
-                }
+    val finds = combine(
+        findsSearchQuery,
+        findsRepository.finds,
+        cacheRepository.caches,
+    ) { searchQuery, finds, caches ->
+        val outcomes = with(findInfoProvider) {
+            finds?.map { find ->
+                find.toFindInfo()
             }
         }
-    }
+        if (outcomes == null || outcomes.any { it is Outcome.Failure }) {
+            Loadable.Failure<List<FindInfo>>(IllegalStateException("Failed to load"))
+        } else {
+            Loadable.Success(
+                outcomes.filterIsInstance<Outcome.Success<FindInfo>>()
+                    .map { it.data }
+                    .search(searchQuery) { it.cache.name }
+            )
+        }
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, Loadable.Loading<List<FindInfo>>())
 
     fun setFindsSearchQuery(query: String) {
         _findsSearchQuery.value = query
@@ -214,5 +204,9 @@ class MainViewModel(
                 }
             }
         }
+    }
+
+    fun logout() {
+        authentication.logout()
     }
 }

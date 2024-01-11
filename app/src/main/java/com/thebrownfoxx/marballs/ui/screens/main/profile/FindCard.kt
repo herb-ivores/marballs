@@ -1,4 +1,4 @@
-package com.thebrownfoxx.marballs.ui.screens.main.finds
+package com.thebrownfoxx.marballs.ui.screens.main.profile
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth

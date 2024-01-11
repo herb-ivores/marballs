@@ -1,5 +1,6 @@
 package com.thebrownfoxx.marballs.services
 
+import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.thebrownfoxx.marballs.domain.Outcome
 import kotlinx.coroutines.Dispatchers
@@ -20,13 +21,15 @@ fun <T> Task<T>.addOnOutcomeListener(onOutcomeReceived: (Outcome<Unit>) -> Unit)
 }
 
 suspend fun <T> Task<T>.awaitOutcome(): Outcome<T> {
-    return withContext(Dispatchers.IO) {
+    val x = withContext(Dispatchers.IO) {
         try {
             Outcome.Success(await())
         } catch (e: Exception) {
             Outcome.Failure(e)
         }
     }
+    Log.d(this::class.simpleName, "awaitOutcome: $x")
+    return x
 }
 
 suspend fun <T> Task<T>.awaitUnitOutcome() = awaitOutcome().map { }
