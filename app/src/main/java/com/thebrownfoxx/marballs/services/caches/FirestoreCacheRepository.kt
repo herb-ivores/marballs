@@ -82,8 +82,15 @@ class FirestoreCacheRepository(private val firestore: FirebaseFirestore) : Cache
     }
 
     override suspend fun updateCache(cache: Cache): Outcome<Unit> = withContext(Dispatchers.IO) {
+        val cacheMap = mapOf(
+            "name" to cache.name,
+            "description" to cache.description,
+            "author" to cache.authorUid,
+            "latitude" to cache.location.latitude,
+            "longitude" to cache.location.longitude,
+        )
         return@withContext firestore.collection("caches").document(cache.id!!)
-            .set(cache)
+            .set(cacheMap)
             .awaitOutcome()
             .map { }
             .also { updateCaches() }
