@@ -50,7 +50,7 @@ import com.thebrownfoxx.marballs.ui.theme.AppTheme
 @Suppress("UNUSED_VARIABLE")
 @Composable
 fun MapScreen(
-    currentLocation: Location?,
+    location: Location?,
     caches: List<CacheInfo>,
     selectedCache: CacheInfo?,
     allowCacheEdit: Boolean,
@@ -67,10 +67,10 @@ fun MapScreen(
     onDeleteCache: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val cameraPositionState = remember(currentLocation?.key.toString()) {
+    val cameraPositionState = remember(location?.key.toString()) {
         CameraPositionState(
             position = CameraPosition.fromLatLngZoom(
-                currentLocation?.toLatLng() ?: LatLng(0.0, 0.0),
+                location?.toLatLng() ?: LatLng(0.0, 0.0),
                 15f,
             ),
         )
@@ -153,7 +153,7 @@ fun MapScreen(
                         true
                     },
                     icon = BitmapDescriptorFactory.defaultMarker(
-                        if (selectedCache == cache) BitmapDescriptorFactory.HUE_RED
+                        if (selectedCache?.id == cache.id) BitmapDescriptorFactory.HUE_RED
                         else BitmapDescriptorFactory.HUE_ORANGE
                     ),
                 )
@@ -173,7 +173,7 @@ fun MapScreen(
 fun MapScreenPreview() {
     AppTheme {
         MapScreen(
-            currentLocation = null,
+            location = null,
             caches = emptyList(),
             selectedCache = null,
             onSelectCache = {},
@@ -197,7 +197,7 @@ fun MapScreenPreview() {
 fun MapScreenWithCachePreview() {
     AppTheme {
         MapScreen(
-            currentLocation = null,
+            location = null,
             caches = emptyList(),
             selectedCache = CacheInfo(
                 id = "1",

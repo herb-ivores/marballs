@@ -33,7 +33,9 @@ class FirebaseAuthentication(private val auth: FirebaseAuth) : Authentication {
     }
 
     override suspend fun login(email: String, password: String): Outcome<Unit> = withContext(Dispatchers.IO) {
-        return@withContext auth.signInWithEmailAndPassword(email, password).awaitUnitOutcome()
+        return@withContext auth.signInWithEmailAndPassword(email, password)
+            .awaitUnitOutcome()
+            .also { updateCurrentUser() }
     }
 
     override fun logout() {

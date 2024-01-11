@@ -45,18 +45,17 @@ class MainViewModel(
     private val _currentScreen = MutableStateFlow(MainScreen.Map)
     val currentScreen = _currentScreen.asStateFlow()
 
-    init {
-        viewModelScope.launch {
-            locationProvider.updateLocation()
-        }
-    }
-
     fun navigateTo(screen: MainScreen) {
         _currentScreen.value = screen
     }
 
     // Map screen
-    val currentLocation = locationProvider.currentLocation
+    private val _location = MutableStateFlow(locationProvider.currentLocation.value)
+    val location = _location.asStateFlow()
+
+    init {
+        resetLocation()
+    }
 
     private val _selectedCache = MutableStateFlow<CacheInfo?>(null)
     val selectedCache = _selectedCache.asStateFlow()
@@ -66,7 +65,7 @@ class MainViewModel(
         selectedCache,
         scope = viewModelScope,
     ) { currentUser, selectedCache ->
-        currentUser == selectedCache?.author
+        currentUser?.uid == selectedCache?.author?.uid
     }
 
     val selectedCacheFound = combineToStateFlow(
@@ -142,6 +141,7 @@ class MainViewModel(
     fun resetLocation() {
         viewModelScope.launch {
             locationProvider.updateLocation()
+            _location.value = locationProvider.currentLocation.value
         }
     }
 
@@ -178,6 +178,7 @@ class MainViewModel(
     fun selectCache(cache: CacheInfo) {
         _currentScreen.value = MainScreen.Map
         _selectedCache.value = cache
+        _location.value = cache.coordinates
     }
 
     private val _findsSearchQuery = MutableStateFlow("")

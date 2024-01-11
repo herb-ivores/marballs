@@ -12,7 +12,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.thebrownfoxx.marballs.services.authentication.Authentication
-import com.thebrownfoxx.marballs.services.authentication.DummyAuthentication
+import com.thebrownfoxx.marballs.services.authentication.FirebaseAuthentication
 import com.thebrownfoxx.marballs.services.cacheinfo.CacheInfoProvider
 import com.thebrownfoxx.marballs.services.cacheinfo.PlacesFirebaseCacheInfoService
 import com.thebrownfoxx.marballs.services.caches.CacheRepository
@@ -50,8 +50,8 @@ class MarballsApplication: Application() {
     override fun onCreate() {
         super.onCreate()
         firebaseAuth = Firebase.auth
-//        _authService = FirebaseAuthentication(firebaseAuth)
-        _authentication = DummyAuthentication()
+        _authentication = FirebaseAuthentication(firebaseAuth)
+//        _authentication = DummyAuthentication()
 
         fusedLocationProviderClient = LocationServices
             .getFusedLocationProviderClient(applicationContext)
@@ -67,8 +67,8 @@ class MarballsApplication: Application() {
 
         Places.initialize(applicationContext, BuildConfig.MAPS_API_KEY)
         placesClient = Places.createClient(applicationContext)
-//        _cacheInfoProvider = DummyCacheInfoProvider()
         _cacheInfoProvider = PlacesFirebaseCacheInfoService(placesClient, authentication, this)
+//        _cacheInfoProvider = DummyCacheInfoProvider()
 
         _findsRepository = DummyFindsRepository()
 

@@ -51,7 +51,7 @@ fun Main(
 
         val currentScreen by currentScreen.collectAsStateWithLifecycle()
 
-        val currentLocation by currentLocation.collectAsStateWithLifecycle()
+        val location by location.collectAsStateWithLifecycle()
         val selectedCache by selectedCache.collectAsStateWithLifecycle()
         val allowCacheEdit by allowCacheEdit.collectAsStateWithLifecycle()
         val selectedCacheFound by selectedCacheFound.collectAsStateWithLifecycle()
@@ -82,7 +82,7 @@ fun Main(
         ) { contentPadding ->
             when (currentScreen) {
                 MainScreen.Map -> MapScreen(
-                    currentLocation = currentLocation,
+                    location = location,
                     caches = caches,
                     selectedCache = selectedCache,
                     onSelectCache = ::selectCache,
