@@ -1,7 +1,6 @@
 plugins {
     id("com.android.application")
     kotlin("android")
-    kotlin("plugin.serialization")
     id("com.google.devtools.ksp") version "1.9.20-1.0.14"
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
     id("com.google.gms.google-services")
@@ -92,12 +91,6 @@ dependencies {
     // Window Size Class
     implementation("androidx.compose.material3:material3-window-size-class:1.1.2")
 
-//    // Room
-//    val roomVersion = "2.6.0"
-//    implementation("androidx.room:room-runtime:$roomVersion")
-//    ksp("androidx.room:room-compiler:$roomVersion")
-//    implementation("androidx.room:room-ktx:$roomVersion")
-
     // Extended Icons
     implementation("androidx.compose.material:material-icons-extended:1.5.4")
 
@@ -106,22 +99,11 @@ dependencies {
     implementation("io.github.raamcosta.compose-destinations:animations-core:$composeDestinationsVersion")
     ksp("io.github.raamcosta.compose-destinations:ksp:$composeDestinationsVersion")
 
-    // Kotlin Serialization
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.1")
-
     // Base 32
     implementation("commons-codec:commons-codec:1.16.0")
 
     // DataStore
     implementation("androidx.datastore:datastore-preferences:1.0.0")
-
-    // Ktor
-    val ktorVersion = "2.3.7"
-    implementation("io.ktor:ktor-client-core:$ktorVersion")
-    implementation("io.ktor:ktor-client-android:$ktorVersion")
-    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
-    implementation("io.ktor:ktor-client-logging:$ktorVersion")
 
     // Firebase
     implementation(platform("com.google.firebase:firebase-bom:32.7.0"))

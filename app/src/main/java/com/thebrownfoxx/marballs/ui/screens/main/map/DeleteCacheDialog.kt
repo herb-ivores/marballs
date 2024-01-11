@@ -29,7 +29,7 @@ fun DeleteCacheDialog(
             },
             title = {
                 Text(
-                    text = "Delete book",
+                    text = "Delete cache",
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth(),
                 )

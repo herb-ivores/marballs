@@ -16,7 +16,7 @@ import kotlinx.coroutines.withContext
 
 class FirebaseAuthentication(
     private val auth: FirebaseAuth,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
 ) : Authentication {
     private val scope = CoroutineScope(Dispatchers.Main)
 
@@ -24,6 +24,10 @@ class FirebaseAuthentication(
     override val currentUser = _currentUser.asStateFlow()
 
     override val loggedIn = currentUser.mapToStateFlow(scope = scope) { it != null }
+
+    init {
+        updateCurrentUser()
+    }
 
     private fun updateCurrentUser() {
         _currentUser.value = auth.currentUser?.let {
@@ -50,11 +54,12 @@ class FirebaseAuthentication(
                 }.map { }
         }
 
-    override suspend fun login(email: String, password: String): Outcome<Unit> = withContext(Dispatchers.IO) {
-        return@withContext auth.signInWithEmailAndPassword(email, password)
-            .awaitUnitOutcome()
-            .also { updateCurrentUser() }
-    }
+    override suspend fun login(email: String, password: String): Outcome<Unit> =
+        withContext(Dispatchers.IO) {
+            return@withContext auth.signInWithEmailAndPassword(email, password)
+                .awaitUnitOutcome()
+                .also { updateCurrentUser() }
+        }
 
     override suspend fun changePassword(
         oldPassword: String,
