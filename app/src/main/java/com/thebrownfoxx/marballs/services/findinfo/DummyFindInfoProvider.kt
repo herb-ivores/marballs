@@ -7,12 +7,14 @@ import com.thebrownfoxx.marballs.domain.Outcome
 import com.thebrownfoxx.marballs.domain.User
 import com.thebrownfoxx.marballs.services.cacheinfo.CacheInfoProvider
 import com.thebrownfoxx.marballs.services.caches.CacheRepository
+import com.thebrownfoxx.marballs.services.user.UserRepository
 import java.time.Instant
 import kotlin.random.Random
 
 class DummyFindInfoProvider(
     private val cacheRepository: CacheRepository,
     private val cacheInfoProvider: CacheInfoProvider,
+    private val userRepository: UserRepository,
 ): FindInfoProvider {
     override suspend fun Find.toFindInfo(): Outcome<FindInfo> {
         val cache = with(cacheInfoProvider) {
